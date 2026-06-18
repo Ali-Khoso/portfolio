@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ali Ahmed Khoso — AI Developer & Full-Stack Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+  --bg:          #0F172A;
+  --bg2:         #131c30;
+  --surface:     #1E293B;
+  --surface2:    #243044;
+  --border:      rgba(99,102,241,.18);
+  --border2:     rgba(99,102,241,.08);
+  --text:        #E2E8F0;
+  --text-muted:  #94A3B8;
+  --text-dim:    #64748B;
+  --indigo:      #6366F1;
+  --violet:      #8B5CF6;
+  --cyan:        #06B6D4;
+  --emerald:     #10B981;
+  --accent-grd:  linear-gradient(135deg,#6366F1,#8B5CF6,#06B6D4);
+  --glow-ind:    0 0 40px rgba(99,102,241,.25);
+  --glow-vio:    0 0 40px rgba(139,92,246,.2);
+  --radius:      16px;
+  --radius-lg:   24px;
+  --transition:  .3s cubic-bezier(.4,0,.2,1);
+}
+html.light {
+  --bg:          #F8FAFC;
+  --bg2:         #F1F5F9;
+  --surface:     #FFFFFF;
+  --surface2:    #F1F5F9;
+  --border:      rgba(99,102,241,.2);
+  --border2:     rgba(99,102,241,.1);
+  --text:        #0F172A;
+  --text-muted:  #475569;
+  --text-dim:    #94A3B8;
+  --glow-ind:    0 4px 24px rgba(99,102,241,.15);
+  --glow-vio:    0 4px 24px rgba(139,92,246,.12);
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.6;
+  overflow-x:hidden;
+  transition:background var(--transition),color var(--transition);
+}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+ul{list-style:none}
+
+/* ============================================================
+   MESH BACKGROUND
+   ============================================================ */
+.mesh-bg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+}
+.mesh-orb{
+  position:absolute;border-radius:50%;filter:blur(80px);opacity:.18;
+  animation:orbFloat 12s ease-in-out infinite alternate;
+}
+html.light .mesh-orb{opacity:.09}
+.orb1{width:600px;height:600px;background:radial-gradient(circle,#6366F1,transparent);top:-150px;left:-150px;animation-delay:0s}
+.orb2{width:500px;height:500px;background:radial-gradient(circle,#8B5CF6,transparent);top:40%;right:-100px;animation-delay:-4s}
+.orb3{width:400px;height:400px;background:radial-gradient(circle,#06B6D4,transparent);bottom:-100px;left:30%;animation-delay:-8s}
+@keyframes orbFloat{0%{transform:translate(0,0) scale(1)}100%{transform:translate(40px,30px) scale(1.1)}}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--indigo);border-radius:99px}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+#navbar{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 5%;height:68px;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  background:rgba(15,23,42,.75);
+  border-bottom:1px solid var(--border2);
+  transition:background var(--transition);
+}
+html.light #navbar{background:rgba(248,250,252,.85)}
+.nav-logo{
+  font-family:'Space Grotesk',sans-serif;
+  font-weight:700;font-size:1.25rem;
+  background:var(--accent-grd);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  letter-spacing:-.02em;
+}
+.nav-links{display:flex;gap:2rem;align-items:center}
+.nav-links a{
+  font-size:.875rem;font-weight:500;color:var(--text-muted);
+  transition:color var(--transition);position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;
+  background:var(--accent-grd);border-radius:1px;
+  transition:width var(--transition);
+}
+.nav-links a:hover,.nav-links a.active{color:var(--text)}
+.nav-links a:hover::after,.nav-links a.active::after{width:100%}
+.nav-right{display:flex;align-items:center;gap:1.5rem}
+/* Theme toggle */
+.theme-toggle{
+  width:52px;height:28px;border-radius:99px;
+  background:var(--surface2);border:1px solid var(--border);
+  position:relative;cursor:pointer;transition:background var(--transition);
+  flex-shrink:0;
+}
+.theme-toggle::after{
+  content:'';position:absolute;top:3px;left:3px;
+  width:20px;height:20px;border-radius:50%;
+  background:var(--accent-grd);
+  transition:transform var(--transition),background var(--transition);
+}
+html.light .theme-toggle::after{transform:translateX(24px)}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
+.hamburger span{width:22px;height:2px;background:var(--text-muted);border-radius:1px;transition:var(--transition)}
+
+/* ============================================================
+   SECTION SCAFFOLD
+   ============================================================ */
+main{position:relative;z-index:1}
+.section{padding:100px 5%;max-width:1200px;margin:0 auto}
+.section-label{
+  display:inline-flex;align-items:center;gap:.5rem;
+  font-family:'JetBrains Mono',monospace;font-size:.75rem;
+  color:var(--indigo);letter-spacing:.1em;text-transform:uppercase;
+  margin-bottom:1rem;
+}
+.section-label::before{content:'//';opacity:.5}
+.section-title{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:clamp(1.75rem,3vw,2.5rem);
+  font-weight:700;letter-spacing:-.03em;
+  line-height:1.2;margin-bottom:.5rem;
+}
+.gradient-text{
+  background:var(--accent-grd);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.section-sub{color:var(--text-muted);font-size:1rem;max-width:520px;margin-bottom:3rem}
+
+/* AOS fade-in */
+.aos{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.aos.visible{opacity:1;transform:none}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+#hero{
+  min-height:100vh;display:flex;align-items:center;
+  padding-top:68px;
+}
+.hero-inner{
+  width:100%;max-width:1200px;margin:0 auto;padding:0 5%;
+  display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;
+}
+.hero-content{}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:.6rem;
+  background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);
+  border-radius:99px;padding:.35rem 1rem;
+  font-size:.8rem;font-family:'JetBrains Mono',monospace;
+  color:var(--indigo);margin-bottom:1.5rem;
+}
+.hero-eyebrow .dot{
+  width:6px;height:6px;border-radius:50%;background:#10B981;
+  box-shadow:0 0 6px #10B981;animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero-name{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:clamp(2.5rem,5vw,4rem);
+  font-weight:700;letter-spacing:-.04em;
+  line-height:1.05;margin-bottom:.5rem;
+}
+.hero-title{
+  font-size:clamp(1rem,2vw,1.3rem);
+  font-weight:400;color:var(--text-muted);
+  margin-bottom:1.5rem;
+}
+.hero-title span{color:var(--cyan);font-weight:500}
+.hero-bio{
+  font-size:.95rem;color:var(--text-muted);line-height:1.75;
+  max-width:480px;margin-bottom:2.5rem;
+}
+.hero-cta{display:flex;gap:1rem;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.75rem 1.75rem;border-radius:12px;
+  font-size:.9rem;font-weight:600;cursor:pointer;
+  transition:all var(--transition);border:none;
+}
+.btn-primary{
+  background:var(--accent-grd);color:#fff;
+  box-shadow:0 4px 20px rgba(99,102,241,.35);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(99,102,241,.5)}
+.btn-outline{
+  background:transparent;color:var(--text);
+  border:1px solid var(--border);
+  backdrop-filter:blur(8px);
+}
+.btn-outline:hover{background:var(--surface);border-color:var(--indigo);transform:translateY(-2px)}
+.hero-stats{
+  display:flex;gap:2.5rem;margin-top:3rem;padding-top:3rem;
+  border-top:1px solid var(--border2);flex-wrap:wrap;
+}
+.stat-item{}
+.stat-num{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:2rem;font-weight:700;
+  background:var(--accent-grd);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.stat-label{font-size:.8rem;color:var(--text-dim);font-weight:500;letter-spacing:.05em;text-transform:uppercase}
+
+/* Hero right – bento grid */
+.hero-bento{
+  display:grid;grid-template-columns:1fr 1fr;
+  grid-template-rows:auto auto;gap:1rem;
+}
+.bento-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:1.5rem;
+  backdrop-filter:blur(12px);
+  transition:transform var(--transition),box-shadow var(--transition);
+  position:relative;overflow:hidden;
+}
+.bento-card::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(135deg,rgba(99,102,241,.08),transparent 60%);
+  pointer-events:none;
+}
+.bento-card:hover{transform:translateY(-4px);box-shadow:var(--glow-ind)}
+.bento-main{grid-column:span 2;padding:2rem;display:flex;flex-direction:column;gap:1rem}
+.bento-avatar{
+  width:80px;height:80px;border-radius:var(--radius);
+  background:var(--accent-grd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:2rem;font-weight:700;color:#fff;
+  font-family:'Space Grotesk',sans-serif;
+  box-shadow:0 8px 24px rgba(99,102,241,.35);
+}
+.bento-name-tag{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700}
+.bento-tag-line{font-size:.8rem;color:var(--text-muted)}
+.bento-small-title{font-size:.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;font-family:'JetBrains Mono',monospace}
+.bento-skill-chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.chip{
+  font-size:.7rem;font-weight:500;padding:.25rem .6rem;
+  border-radius:6px;background:rgba(99,102,241,.15);
+  border:1px solid rgba(99,102,241,.25);color:var(--indigo);
+}
+.chip.cyan{background:rgba(6,182,212,.12);border-color:rgba(6,182,212,.25);color:var(--cyan)}
+.chip.emerald{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.25);color:var(--emerald)}
+.bento-status{display:flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--emerald)}
+.bento-status .dot{width:7px;height:7px;background:var(--emerald);border-radius:50%;box-shadow:0 0 6px var(--emerald);animation:pulse 2s infinite}
+.bento-location{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--text-muted)}
+.bento-uni{font-size:.8rem;color:var(--text-muted);margin-top:.3rem}
+.bento-year{font-size:1.5rem;font-weight:700;font-family:'Space Grotesk',sans-serif}
+
+/* ============================================================
+   SKILLS
+   ============================================================ */
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem}
+.skill-category{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:1.75rem;
+  transition:transform var(--transition),box-shadow var(--transition);
+}
+.skill-category:hover{transform:translateY(-4px);box-shadow:var(--glow-ind)}
+.skill-cat-icon{
+  width:44px;height:44px;border-radius:12px;
+  background:var(--accent-grd);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:1.1rem;margin-bottom:1rem;
+}
+.skill-cat-name{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:1rem;margin-bottom:1rem}
+.skill-tags{display:flex;flex-wrap:wrap;gap:.4rem}
+.skill-tag{
+  font-size:.75rem;font-weight:500;padding:.3rem .7rem;
+  border-radius:8px;background:var(--surface2);
+  border:1px solid var(--border2);color:var(--text-muted);
+  transition:all var(--transition);
+}
+.skill-tag:hover{background:rgba(99,102,241,.12);border-color:rgba(99,102,241,.3);color:var(--indigo)}
+
+/* ============================================================
+   EXPERIENCE
+   ============================================================ */
+.exp-timeline{display:flex;flex-direction:column;gap:1.5rem;position:relative}
+.exp-timeline::before{
+  content:'';position:absolute;left:20px;top:0;bottom:0;width:1px;
+  background:linear-gradient(to bottom,var(--indigo),var(--violet),transparent);
+}
+.exp-item{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:1.75rem 1.75rem 1.75rem 3.5rem;
+  position:relative;
+  transition:transform var(--transition),box-shadow var(--transition);
+}
+.exp-item:hover{transform:translateX(6px);box-shadow:var(--glow-ind)}
+.exp-item::before{
+  content:'';position:absolute;left:13px;top:1.75rem;
+  width:14px;height:14px;border-radius:50%;
+  background:var(--accent-grd);
+  box-shadow:0 0 12px rgba(99,102,241,.5);
+}
+.exp-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.5rem;margin-bottom:.75rem}
+.exp-role{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.05rem}
+.exp-company{font-size:.9rem;color:var(--indigo);font-weight:500}
+.exp-period{
+  font-size:.78rem;font-family:'JetBrains Mono',monospace;
+  color:var(--text-dim);background:var(--surface2);
+  padding:.25rem .65rem;border-radius:6px;border:1px solid var(--border2);
+  white-space:nowrap;
+}
+.exp-desc{font-size:.875rem;color:var(--text-muted);line-height:1.7}
+.exp-desc li{padding:.2rem 0;padding-left:1rem;position:relative}
+.exp-desc li::before{content:'▸';position:absolute;left:0;color:var(--indigo)}
+
+/* ============================================================
+   RESEARCH
+   ============================================================ */
+.research-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:2.5rem;
+  position:relative;overflow:hidden;
+}
+.research-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--accent-grd);
+}
+.research-card::after{
+  content:'';position:absolute;top:-80px;right:-80px;
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(99,102,241,.12),transparent);
+  pointer-events:none;
+}
+.research-badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);
+  border-radius:8px;padding:.4rem .9rem;
+  font-size:.78rem;font-weight:600;color:var(--indigo);
+  font-family:'JetBrains Mono',monospace;
+  margin-bottom:1.5rem;
+}
+.research-title{font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:.5rem}
+.research-meta{display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.research-meta span{font-size:.8rem;color:var(--text-dim);display:flex;align-items:center;gap:.3rem}
+.research-meta span i{color:var(--indigo)}
+.research-highlights{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-top:1.5rem}
+.res-highlight{
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:var(--radius);padding:1.2rem;
+  display:flex;flex-direction:column;gap:.3rem;
+}
+.res-num{font-family:'Space Grotesk',sans-serif;font-size:1.75rem;font-weight:700;color:var(--indigo)}
+.res-label{font-size:.78rem;color:var(--text-muted);font-weight:500}
+.res-desc{font-size:.875rem;color:var(--text-muted);line-height:1.65;margin-top:1rem}
+
+/* ============================================================
+   PROJECTS SLIDER
+   ============================================================ */
+.slider-wrapper{position:relative;overflow:hidden}
+.slider-track{display:flex;gap:1.5rem;transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.project-card{
+  flex:0 0 clamp(280px,35vw,360px);
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:1.75rem;
+  display:flex;flex-direction:column;
+  transition:transform var(--transition),box-shadow var(--transition);
+  cursor:grab;
+}
+.project-card:active{cursor:grabbing}
+.project-card:hover{transform:translateY(-6px) rotate(.5deg);box-shadow:0 16px 48px rgba(99,102,241,.2)}
+.project-num{
+  font-family:'JetBrains Mono',monospace;font-size:.7rem;
+  color:var(--indigo);margin-bottom:1rem;
+}
+.project-icon{
+  width:48px;height:48px;border-radius:12px;
+  background:var(--accent-grd);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:1.2rem;margin-bottom:1.25rem;
+}
+.project-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1rem;margin-bottom:.5rem}
+.project-desc{font-size:.82rem;color:var(--text-muted);line-height:1.65;flex:1;margin-bottom:1.25rem}
+.project-tools{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:1.25rem}
+.tool-badge{
+  font-size:.68rem;font-weight:600;padding:.2rem .55rem;
+  border-radius:5px;background:var(--surface2);
+  border:1px solid var(--border2);color:var(--text-muted);
+}
+.project-link{
+  display:inline-flex;align-items:center;gap:.4rem;
+  font-size:.8rem;color:var(--indigo);font-weight:500;
+  transition:gap var(--transition);
+}
+.project-link:hover{gap:.7rem;color:var(--violet)}
+/* Slider controls */
+.slider-controls{display:flex;justify-content:center;align-items:center;gap:1rem;margin-top:2rem}
+.slider-btn{
+  width:40px;height:40px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text-muted);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:.9rem;
+  transition:all var(--transition);
+}
+.slider-btn:hover{background:var(--indigo);color:#fff;border-color:var(--indigo);transform:scale(1.1)}
+.slider-dots{display:flex;gap:.4rem}
+.dot-ind{
+  width:6px;height:6px;border-radius:50%;background:var(--border);
+  cursor:pointer;transition:all var(--transition);
+}
+.dot-ind.active{width:20px;border-radius:3px;background:var(--indigo)}
+
+/* ============================================================
+   CERTIFICATIONS SLIDER
+   ============================================================ */
+.cert-track-wrap{overflow:hidden;mask-image:linear-gradient(to right,transparent,black 10%,black 90%,transparent)}
+.cert-track{display:flex;gap:1rem;width:max-content;animation:certScroll 40s linear infinite}
+.cert-track:hover{animation-play-state:paused}
+@keyframes certScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.cert-card{
+  flex-shrink:0;width:280px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:1.25rem 1.5rem;
+  display:flex;flex-direction:column;gap:.5rem;
+  transition:box-shadow var(--transition);
+}
+.cert-card:hover{box-shadow:var(--glow-vio)}
+.cert-issuer{
+  font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--indigo);font-family:'JetBrains Mono',monospace;
+}
+.cert-name{font-size:.83rem;font-weight:600;color:var(--text);line-height:1.4}
+.cert-icon{font-size:.9rem;color:var(--violet)}
+
+/* ============================================================
+   CONTACT
+   ============================================================ */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+.contact-info-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:2.5rem;
+  display:flex;flex-direction:column;gap:1.5rem;
+}
+.contact-heading{font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:.5rem}
+.contact-text{font-size:.9rem;color:var(--text-muted);line-height:1.7}
+.contact-item{display:flex;align-items:center;gap:1rem}
+.contact-item-icon{
+  width:44px;height:44px;border-radius:12px;flex-shrink:0;
+  background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--indigo);font-size:1rem;
+}
+.contact-item-label{font-size:.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.contact-item-val{font-size:.875rem;color:var(--text);font-weight:500}
+.social-row{display:flex;gap:.75rem;flex-wrap:wrap}
+.social-btn{
+  width:44px;height:44px;border-radius:12px;
+  background:var(--surface2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;color:var(--text-muted);
+  transition:all var(--transition);
+}
+.social-btn:hover{background:var(--indigo);color:#fff;transform:translateY(-3px);box-shadow:0 6px 20px rgba(99,102,241,.35)}
+.contact-form-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:2.5rem;
+}
+.form-group{margin-bottom:1.25rem}
+.form-group label{display:block;font-size:.8rem;font-weight:600;color:var(--text-muted);margin-bottom:.4rem;letter-spacing:.05em;text-transform:uppercase}
+.form-group input,.form-group textarea{
+  width:100%;background:var(--surface2);
+  border:1px solid var(--border);border-radius:10px;
+  padding:.75rem 1rem;color:var(--text);font-family:'Inter',sans-serif;font-size:.9rem;
+  transition:border-color var(--transition),box-shadow var(--transition);
+  outline:none;resize:vertical;
+}
+.form-group input:focus,.form-group textarea:focus{
+  border-color:var(--indigo);
+  box-shadow:0 0 0 3px rgba(99,102,241,.15);
+}
+.form-group textarea{min-height:120px}
+.btn-send{width:100%;justify-content:center;margin-top:.5rem}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer{
+  text-align:center;padding:3rem 5%;
+  border-top:1px solid var(--border2);
+  position:relative;z-index:1;
+}
+.footer-text{font-size:.85rem;color:var(--text-dim)}
+.footer-text span{background:var(--accent-grd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:600}
+
+/* ============================================================
+   WHATSAPP FLOAT
+   ============================================================ */
+.wa-float{
+  position:fixed;bottom:2rem;right:2rem;z-index:999;
+  width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(135deg,#25D366,#128C7E);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:1.5rem;
+  box-shadow:0 6px 24px rgba(37,211,102,.4);
+  cursor:pointer;
+  transition:transform var(--transition),box-shadow var(--transition);
+  animation:waPulse 3s ease-in-out infinite;
+}
+.wa-float:hover{transform:scale(1.12);box-shadow:0 10px 32px rgba(37,211,102,.6);animation:none}
+@keyframes waPulse{0%,100%{box-shadow:0 6px 24px rgba(37,211,102,.4),0 0 0 0 rgba(37,211,102,.35)}50%{box-shadow:0 6px 24px rgba(37,211,102,.4),0 0 0 12px rgba(37,211,102,.0)}}
+
+/* ============================================================
+   MOBILE NAV DRAWER
+   ============================================================ */
+.nav-drawer{
+  position:fixed;inset:0;z-index:999;
+  background:rgba(15,23,42,.97);
+  backdrop-filter:blur(20px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2rem;
+  transform:translateX(100%);transition:transform .4s cubic-bezier(.4,0,.2,1);
+}
+.nav-drawer.open{transform:none}
+.nav-drawer a{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:600;color:var(--text)}
+.drawer-close{
+  position:absolute;top:1.5rem;right:1.5rem;
+  width:40px;height:40px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--text-muted);font-size:1rem;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:900px){
+  .hero-inner{grid-template-columns:1fr;text-align:center}
+  .hero-cta{justify-content:center}
+  .hero-stats{justify-content:center}
+  .hero-bio{margin:0 auto 2.5rem}
+  .hero-bento{display:grid;grid-template-columns:1fr 1fr;max-width:420px;margin:0 auto}
+  .contact-grid{grid-template-columns:1fr}
+  .nav-links{display:none}
+  .hamburger{display:flex}
+  .exp-timeline::before{display:none}
+  .exp-item{padding-left:1.75rem}
+  .exp-item::before{display:none}
+}
+@media(max-width:600px){
+  .hero-bento{grid-template-columns:1fr}
+  .bento-main{grid-column:span 1}
+  .hero-stats{gap:1.5rem}
+  .section{padding:70px 5%}
+}
+</style>
+</head>
+<body>
+
+<!-- Mesh background -->
+<div class="mesh-bg">
+  <div class="mesh-orb orb1"></div>
+  <div class="mesh-orb orb2"></div>
+  <div class="mesh-orb orb3"></div>
+</div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="nav-logo">AAK.</div>
+  <div class="nav-links">
+    <a href="#hero">Home</a>
+    <a href="#skills">Skills</a>
+    <a href="#experience">Experience</a>
+    <a href="#research">Research</a>
+    <a href="#projects">Projects</a>
+    <a href="#certifications">Certifications</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="nav-right">
+    <div class="theme-toggle" id="themeToggle" title="Toggle theme" role="button" aria-label="Toggle dark/light mode"></div>
+    <div class="hamburger" id="hamburger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE DRAWER -->
+<nav class="nav-drawer" id="navDrawer">
+  <div class="drawer-close" id="drawerClose"><i class="fas fa-times"></i></div>
+  <a href="#hero" class="drawer-link">Home</a>
+  <a href="#skills" class="drawer-link">Skills</a>
+  <a href="#experience" class="drawer-link">Experience</a>
+  <a href="#research" class="drawer-link">Research</a>
+  <a href="#projects" class="drawer-link">Projects</a>
+  <a href="#certifications" class="drawer-link">Certifications</a>
+  <a href="#contact" class="drawer-link">Contact</a>
+</nav>
+
+<main>
+
+<!-- ============================================================ HERO -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-content aos">
+      <div class="hero-eyebrow">
+        <span class="dot"></span>
+        Available for Freelance &amp; Full-time
+      </div>
+      <h1 class="hero-name">
+        Ali Ahmed<br><span class="gradient-text">Khoso</span>
+      </h1>
+      <p class="hero-title">
+        <span>AI Developer</span> &nbsp;·&nbsp; Web &amp; App Engineer
+      </p>
+      <p class="hero-bio">
+        Building intelligent systems at the intersection of AI and software engineering.
+        From LLM fine-tuning and autonomous agents to full-stack apps and workflow automation —
+        I turn complex ideas into production-ready solutions.
+      </p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn btn-primary"><i class="fas fa-layer-group"></i> View Projects</a>
+        <a href="#contact" class="btn btn-outline"><i class="fas fa-paper-plane"></i> Get in Touch</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num" data-target="14">0</div>
+          <div class="stat-label">Projects Built</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" data-target="14">0</div>
+          <div class="stat-label">IBM Certs</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" data-target="3">0</div>
+          <div class="stat-label">Years Active</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-bento aos" style="transition-delay:.15s">
+      <div class="bento-card bento-main">
+        <div style="display:flex;align-items:center;gap:1rem">
+          <div class="bento-avatar">AK</div>
+          <div>
+            <div class="bento-name-tag">Ali Ahmed Khoso</div>
+            <div class="bento-tag-line">NUTECH, Islamabad — BSCS 2023–2027</div>
+          </div>
+        </div>
+        <div class="bento-status"><span class="dot"></span> Open to opportunities</div>
+      </div>
+      <div class="bento-card">
+        <div class="bento-small-title">Core AI Stack</div>
+        <div class="bento-skill-chips">
+          <span class="chip">LangChain</span>
+          <span class="chip">RAG</span>
+          <span class="chip">LLM Fine-Tuning</span>
+          <span class="chip">OpenAI API</span>
+          <span class="chip">HuggingFace</span>
+        </div>
+      </div>
+      <div class="bento-card">
+        <div class="bento-small-title">Web / App</div>
+        <div class="bento-skill-chips">
+          <span class="chip cyan">React</span>
+          <span class="chip cyan">Node.js</span>
+          <span class="chip cyan">Kotlin</span>
+          <span class="chip cyan">Firebase</span>
+        </div>
+      </div>
+      <div class="bento-card" style="grid-column:span 2">
+        <div class="bento-small-title">Automation</div>
+        <div class="bento-skill-chips">
+          <span class="chip emerald">N8N</span>
+          <span class="chip emerald">AutoGPT</span>
+          <span class="chip emerald">AI Voice Agents</span>
+          <span class="chip emerald">CRM Automation</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ SKILLS -->
+<section id="skills" class="section">
+  <div class="aos">
+    <div class="section-label">Expertise</div>
+    <h2 class="section-title">Technical <span class="gradient-text">Skills</span></h2>
+    <p class="section-sub">A breadth of tools across AI/ML, full-stack development, and intelligent automation.</p>
+  </div>
+  <div class="skills-grid">
+    <div class="skill-category aos">
+      <div class="skill-cat-icon"><i class="fas fa-code"></i></div>
+      <div class="skill-cat-name">Languages</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Python</span><span class="skill-tag">C++</span>
+        <span class="skill-tag">Java</span><span class="skill-tag">Kotlin</span>
+        <span class="skill-tag">JavaScript</span>
+      </div>
+    </div>
+    <div class="skill-category aos" style="transition-delay:.1s">
+      <div class="skill-cat-icon" style="background:linear-gradient(135deg,#8B5CF6,#06B6D4)"><i class="fas fa-brain"></i></div>
+      <div class="skill-cat-name">AI / ML</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Scikit-learn</span><span class="skill-tag">TensorFlow</span>
+        <span class="skill-tag">Keras</span><span class="skill-tag">OpenCV</span>
+        <span class="skill-tag">Pandas</span><span class="skill-tag">NumPy</span>
+      </div>
+    </div>
+    <div class="skill-category aos" style="transition-delay:.2s">
+      <div class="skill-cat-icon" style="background:linear-gradient(135deg,#06B6D4,#10B981)"><i class="fas fa-robot"></i></div>
+      <div class="skill-cat-name">Generative AI &amp; Agents</div>
+      <div class="skill-tags">
+        <span class="skill-tag">LangChain</span><span class="skill-tag">OpenAI API</span>
+        <span class="skill-tag">Hugging Face</span><span class="skill-tag">AutoGPT</span>
+        <span class="skill-tag">RAG</span><span class="skill-tag">LLM Fine-Tuning</span>
+      </div>
+    </div>
+    <div class="skill-category aos" style="transition-delay:.3s">
+      <div class="skill-cat-icon" style="background:linear-gradient(135deg,#10B981,#6366F1)"><i class="fas fa-globe"></i></div>
+      <div class="skill-cat-name">Web &amp; App</div>
+      <div class="skill-tags">
+        <span class="skill-tag">React</span><span class="skill-tag">Node.js</span>
+        <span class="skill-tag">Express.js</span><span class="skill-tag">HTML5/CSS3</span>
+        <span class="skill-tag">Kotlin Android</span><span class="skill-tag">.NET WPF</span>
+      </div>
+    </div>
+    <div class="skill-category aos" style="transition-delay:.35s">
+      <div class="skill-cat-icon" style="background:linear-gradient(135deg,#F59E0B,#EF4444)"><i class="fas fa-database"></i></div>
+      <div class="skill-cat-name">Databases</div>
+      <div class="skill-tags">
+        <span class="skill-tag">MongoDB</span><span class="skill-tag">Firebase Firestore</span>
+        <span class="skill-tag">SQL</span>
+      </div>
+    </div>
+    <div class="skill-category aos" style="transition-delay:.4s">
+      <div class="skill-cat-icon" style="background:linear-gradient(135deg,#EC4899,#8B5CF6)"><i class="fas fa-bolt"></i></div>
+      <div class="skill-cat-name">Automation</div>
+      <div class="skill-tags">
+        <span class="skill-tag">N8N</span><span class="skill-tag">API Integration</span>
+        <span class="skill-tag">Webhooks</span><span class="skill-tag">Workflow Design</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ EXPERIENCE -->
+<section id="experience" class="section">
+  <div class="aos">
+    <div class="section-label">Career</div>
+    <h2 class="section-title">Work <span class="gradient-text">Experience</span></h2>
+    <p class="section-sub">Building real-world AI systems and full-stack solutions across organizations.</p>
+  </div>
+  <div class="exp-timeline">
+    <div class="exp-item aos">
+      <div class="exp-header">
+        <div>
+          <div class="exp-role">AI Automation Engineer</div>
+          <div class="exp-company">UnitZero</div>
+        </div>
+        <div class="exp-period">2024 – Present</div>
+      </div>
+      <ul class="exp-desc">
+        <li>Specialize in AI-powered workflow automation and business process optimization.</li>
+        <li>Developed AI voice agents, CRM systems, SaaS platforms, and full-stack web/mobile apps using Java, .NET, Kotlin, Firebase, and Python.</li>
+        <li>Built RAG assistants, marketing automation systems, and scalable LangChain + n8n integrations.</li>
+      </ul>
+    </div>
+    <div class="exp-item aos" style="transition-delay:.1s">
+      <div class="exp-header">
+        <div>
+          <div class="exp-role">Winter Intern</div>
+          <div class="exp-company">ISPR (Inter-Services Public Relations)</div>
+        </div>
+        <div class="exp-period">Jan 2026 – Feb 2026</div>
+      </div>
+      <ul class="exp-desc">
+        <li>Assisted in media monitoring, digital communication, and content coordination.</li>
+        <li>Gained practical exposure to strategic communication, public relations, and organizational workflow.</li>
+      </ul>
+    </div>
+    <div class="exp-item aos" style="transition-delay:.2s">
+      <div class="exp-header">
+        <div>
+          <div class="exp-role">Freelance Developer</div>
+          <div class="exp-company">Fiverr</div>
+        </div>
+        <div class="exp-period">2023 – 2024</div>
+      </div>
+      <ul class="exp-desc">
+        <li>Completed freelance coding assignments for international clients.</li>
+        <li>Developed responsive web applications using modern frontend and backend technologies.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ RESEARCH -->
+<section id="research" class="section">
+  <div class="aos">
+    <div class="section-label">Academia</div>
+    <h2 class="section-title">Research <span class="gradient-text">Work</span></h2>
+    <p class="section-sub">Original academic contribution in AI-based cloud computing resource management.</p>
+  </div>
+  <div class="research-card aos">
+    <div class="research-badge"><i class="fas fa-flask"></i> Spring 2026 · CS470 Cloud Computing · NUTECH</div>
+    <h3 class="research-title">Systematic Literature Review — AI-Based Resource Management in Cloud Computing</h3>
+    <div class="research-meta">
+      <span><i class="fas fa-books"></i> 15 Papers Reviewed (IEEE, ACM, Springer)</span>
+      <span><i class="fas fa-calendar"></i> Coverage: 2020–2026</span>
+    </div>
+    <p class="res-desc">
+      Conducted a comprehensive systematic literature review identifying five core research themes and six critical gaps across AI-based cloud resource management. 
+      Proposed the original <strong style="color:var(--indigo)">ECAO (Explainable Carbon-Aware AI Orchestration)</strong> framework — an original contribution combining explainability, carbon awareness, and autonomous orchestration in cloud environments. 
+      Findings were presented in a structured 10-slide academic deck with detailed speaker notes.
+    </p>
+    <div class="research-highlights">
+      <div class="res-highlight">
+        <div class="res-num">15</div>
+        <div class="res-label">Papers Reviewed</div>
+      </div>
+      <div class="res-highlight">
+        <div class="res-num">6</div>
+        <div class="res-label">Critical Gaps Identified</div>
+      </div>
+      <div class="res-highlight">
+        <div class="res-num">5</div>
+        <div class="res-label">Core Research Themes</div>
+      </div>
+      <div class="res-highlight">
+        <div class="res-num">1</div>
+        <div class="res-label">Original Framework Proposed (ECAO)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ PROJECTS -->
+<section id="projects" class="section">
+  <div class="aos">
+    <div class="section-label">Portfolio</div>
+    <h2 class="section-title">Featured <span class="gradient-text">Projects</span></h2>
+    <p class="section-sub">14 projects — swipe or use arrows to explore. Each built end-to-end with production-ready code.</p>
+  </div>
+  <div class="slider-wrapper" id="projectSlider">
+    <div class="slider-track" id="projectTrack">
+
+      <!-- 01 -->
+      <div class="project-card">
+        <div class="project-num">01 / 14</div>
+        <div class="project-icon"><i class="fas fa-map-marked-alt"></i></div>
+        <div class="project-title">Google Maps Leads Scraper</div>
+        <div class="project-desc">Automated lead generation tool that extracts business names, phones, websites, addresses, ratings, and reviews from Google Maps without APIs — with Excel report generation.</div>
+        <div class="project-tools">
+          <span class="tool-badge">Python</span><span class="tool-badge">Playwright</span>
+          <span class="tool-badge">AsyncIO</span><span class="tool-badge">OpenPyXL</span><span class="tool-badge">Regex</span>
+        </div>
+        <a href="https://github.com/Alikhoso81/google-maps-scraper" target="_blank" class="project-link"><i class="fab fa-github"></i> View on GitHub <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <!-- 02 -->
+      <div class="project-card">
+        <div class="project-num">02 / 14</div>
+        <div class="project-icon" style="background:linear-gradient(135deg,#10B981,#06B6D4)"><i class="fas fa-bell"></i></div>
+        <div class="project-title">New Order Alert System (E-Commerce)</div>
+        <div class="project-desc">N8N automation workflow detecting new orders from Shopify or WooCommerce and sending detailed real-time alerts to an operations Slack channel.</div>
+        <div class="project-tools">
+          <span class="tool-badge">N8N</span><span class="tool-badge">Shopify API</span>
+          <span class="tool-badge">WooCommerce REST API</span><span class="tool-badge">Slack API</span><span class="tool-badge">Webhooks</span><span class="tool-badge">JSON</span>
+        </div>
+        <a href="https://github.com/Alikhoso81/n8n-Leads-scraper" target="_blank" class="project-link"><i class="fab fa-github"></i> View on GitHub <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <!-- 03 -->
+      <div class="project-card">
+        <div class="project-num">03 / 14</div>
+        <div class="project-icon" style="background:linear-gradient(135deg,#6366F1,#8B5CF6)"><i class="fas fa-robot"></i></div>
+        <div class="project-title">AI Lead Generation System</div>
+        <div class="project-desc">Intelligent automated pipeline that scrapes, filters, and qualifies leads using AI — combining web scraping with smart scoring logic for sales teams.</div>
+        <div class="project-tools">
+          <span class="tool-badge">Python</span><span class="tool-badge">AI/ML</span><span class="tool-badge">Automation</span>
+        </div>
+        <a href="https://github.com/Alikhoso81/ai-leadgen-system" target="_blank" class="project-link"><i class="fab fa-github"></i> View on GitHub <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <!-- 04 -->
+      <div class="project-card">
+        <div class="project-num">04 / 14</div>
+        <div class="project-icon" style="background:linear-gradient(135deg,#F59E0B,#EF4444)"><i class="fas fa-hotel"></i></div>
+        <div class="project-title">Jubili Hall Booking Website</div>
+        <div class="project-desc">Complete hall booking web app with room selection, check-in date forms, gallery, and real-time booking confirmation. Responsive multi-section layout with client-side form validation.</div>
+        <div class="project-tools">
+          <span class="tool-badge">HTML</span><span class="tool-badge">CSS</span>
+          <span class="tool-badge">JavaScript</span><span class="tool-badge">Node.js</span>
+        </div>
+        <a href="https://github.com/Alikhoso81/jubili-hall-booking-website" target="_blank" class="project-link"><i class="fab fa-github"></i> View on GitHub <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <!-- 05 -->
+      <div class="project-card">
+        <div class="project-num">05 / 14</div>
+        <div class="project-icon" style="background:linear-gradient(135deg,#EC4899,#8B5CF6)"><i class="fas fa-hand-holding-heart"></i></div>
+        <div class="project-title">SpreadHope Foundation App</div>
+        <div class="project-desc">Android app for a charity/NGO using Kotlin with Firebase backend. Features user authentication, real-time donation tracking, and content management.</div>
+        <div class="project-tools">
+          <span class="tool-badge">Kotlin</span><span class="tool-badge">Android</span>
+          <span class="tool-badge">Firebase</span>
+        </div>
+        <a href="https://github.com/Alikhoso81/SpreadHopeFoundation" target="_blank" class="project-link"><i class="fab fa-github"></i> View on GitHub <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <!-- 06 -->
+      <div class="project-card">
+        <div class="project-num">06 / 14</div>
+        <div class="project-icon" style="background:linear-gradient(135deg,#D97706,#B45309)"><i class="fas fa-utensils"></i></div>
+        <div class="project-title">Savoria — Culinary Website</div>
+        <div class="project-desc">Fully responsive culinary site with recipe filtering, scroll-triggered animations via IntersectionObserver, live password strength meter, and editorial UI with Terracotta/Sage/Cream palette.</div>
+        <div class="project-tools">
+          <span class="tool-badge">HTML5</span><span class="tool-badge">CSS3</span>
+          <span class="tool-badge">Vanilla JS (ES6+)</span><span class="tool-badge">Font Awesome</span>
+        </div>
+        <a href="https://github.com/Alikhoso81" target="_blank" class="project-link"><i class="fab fa-github"></i> View on GitHub <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <!-- 07 -->
+      <div class="project-card">
+        <div class="project-num">07 / 14</div>
+        <div class="project-icon" style="background:linear-gradient(135deg,#06B6D4,#6366F1)"><i class="fas fa-store"></i></div>
+        <div class="project-title">Beauty Parlor Management System</div>
+        <div class="project-desc">Full-stack app with Node.js/Express REST API and MongoDB. Manages inventory, customer billing, feedback, and CRUD operations with a dynamic image slider and live bill calculation.</div>
+        <div class="project-tools">
+          <span class="tool-badge">Node.js</span><span class="tool-badge">Express.js</span>
+          <span class="tool-badge">MongoDB</span><span class="tool-badge">HTML/CSS/JS</span>
+        </div>
+        <a href="https://github.com/Alikhoso81" target="_blank" class="project-link"><i class="fab fa-github"></i> View on GitHub <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <!-- 08 -->
+      <div class="project-card">
+        <div class="project-num">08 / 14</div>
+        <div class="project-icon" style="background:linear-gradient(135deg,#0EA5E9,#10B981)"><i class="fas fa-bed"></i></div>
+        <div class="project-title">Room Booking Webpage (Luxury Resorts)</div>
+        <div class="project-desc">Responsive multi-section hotel booking site with hero, image gallery, real-time room type selection, and client-side form validation with inline error messages and booking confirmation.</div>
+        <div class="project-tools">
+          <span class="tool-badge">HTML5</span><span class="tool-badge">CSS3</span>
+          <span class="tool-badge">JavaScript</span>
+        </div>
+        <a href="https://github.com/Alikhoso81" target="_blank" class="project-link"><i class="fab fa-github"></i> View on GitHub <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <!-- 09 -->
+      <div class="project-card">
+        <div class="project-num">09 / 14</div>
+        <div class="project-icon" style="background:linear-gradient(135deg,#7C3AED,#4F46E5)"><i class="fas fa-graduation-cap"></i></div>
+        <div class="project-title">Student Information System</div>
+        <div class="project-desc">Windows desktop application built with C# and WPF for managing student records, course enrollment, and grade tracking. Clean XAML-based UI with data binding and full CRUD operations.</div>
+        <div class="project-tools">
+          <span class="tool-badge">C#</span><span class="tool-badge">.NET</span>
+          <span class="tool-badge">WPF</span><span class="tool-badge">XAML</span>
+        </div>
+        <a href="https://github.com/Alikhoso81" target="_blank" class="project-link"><i class="fab fa-github"></i> View on GitHub <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <!-- 10 -->
+      <div class="project-card">
+        <div class="project-num">10 / 14</div>
+        <div class="project-icon" style="background:linear-gradient(135deg,#10B981,#6366F1)"><i class="fas fa-traffic-light"></i></div>
+        <div class="project-title">Adaptive Traffic Signal Timer</div>
+        <div class="project-desc">Smart traffic management system using ML-based vehicle density detection (OpenCV) to dynamically adjust signal timings in real time with Pygame simulation.</div>
+        <div class="project-tools">
+          <span class="tool-badge">Python</span><span class="tool-badge">OpenCV</span>
+          <span class="tool-badge">Object Detection</span><span class="tool-badge">Pygame</span>
+        </div>
+        <a href="https://github.com/Alikhoso81" target="_blank" class="project-link"><i class="fab fa-github"></i> View on GitHub <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <!-- 11 -->
+      <div class="project-card">
+        <div class="project-num">11 / 14</div>
+        <div class="project-icon" style="background:linear-gradient(135deg,#8B5CF6,#06B6D4)"><i class="fas fa-chart-line"></i></div>
+        <div class="project-title">Walmart Sales Prediction</div>
+        <div class="project-desc">ML application forecasting weekly Walmart store sales using predictive analytics. Features a user-friendly Tkinter GUI for interactive data visualization and analysis.</div>
+        <div class="project-tools">
+          <span class="tool-badge">Python</span><span class="tool-badge">Scikit-learn</span>
+          <span class="tool-badge">Pandas</span><span class="tool-badge">Tkinter</span>
+        </div>
+        <a href="https://github.com/Alikhoso81" target="_blank" class="project-link"><i class="fab fa-github"></i> View on GitHub <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <!-- 12 -->
+      <div class="project-card">
+        <div class="project-num">12 / 14</div>
+        <div class="project-icon" style="background:linear-gradient(135deg,#059669,#10B981)"><i class="fas fa-seedling"></i></div>
+        <div class="project-title">Smart Soil Monitoring System</div>
+        <div class="project-desc">Hardware-integrated AI system that detects soil dryness, moisture, humidity, and temperature using sensors. Applies ML to analyze data for smart agricultural decision-making.</div>
+        <div class="project-tools">
+          <span class="tool-badge">Arduino</span><span class="tool-badge">DHT11</span>
+          <span class="tool-badge">Python</span><span class="tool-badge">Scikit-learn</span><span class="tool-badge">NumPy</span>
+        </div>
+        <a href="https://github.com/Alikhoso81" target="_blank" class="project-link"><i class="fab fa-github"></i> View on GitHub <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <!-- 13 -->
+      <div class="project-card">
+        <div class="project-num">13 / 14</div>
+        <div class="project-icon" style="background:linear-gradient(135deg,#F43F5E,#8B5CF6)"><i class="fas fa-smile"></i></div>
+        <div class="project-title">Emotion Detection App</div>
+        <div class="project-desc">Real-time facial emotion recognition application using deep learning to identify and classify emotions from live camera input or uploaded images.</div>
+        <div class="project-tools">
+          <span class="tool-badge">Python</span><span class="tool-badge">OpenCV</span>
+          <span class="tool-badge">Deep Learning</span><span class="tool-badge">TensorFlow/Keras</span>
+        </div>
+        <a href="https://github.com/Alikhoso81/emotion-detection-app" target="_blank" class="project-link"><i class="fab fa-github"></i> View on GitHub <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <!-- 14 -->
+      <div class="project-card">
+        <div class="project-num">14 / 14</div>
+        <div class="project-icon" style="background:linear-gradient(135deg,#0EA5E9,#6366F1)"><i class="fas fa-file-alt"></i></div>
+        <div class="project-title">SmartFlow — Form Builder</div>
+        <div class="project-desc">Clean, interactive multi-section form builder interface crafted with HTML and CSS. Focuses on responsive layout, accessibility, and smooth user-friendly form experiences.</div>
+        <div class="project-tools">
+          <span class="tool-badge">HTML5</span><span class="tool-badge">CSS3</span>
+          <span class="tool-badge">JavaScript</span>
+        </div>
+        <a href="https://github.com/Alikhoso81/SmartFlowProject" target="_blank" class="project-link"><i class="fab fa-github"></i> View on GitHub <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+    </div>
+  </div>
+  <div class="slider-controls">
+    <button class="slider-btn" id="projPrev" aria-label="Previous"><i class="fas fa-arrow-left"></i></button>
+    <div class="slider-dots" id="projDots"></div>
+    <button class="slider-btn" id="projNext" aria-label="Next"><i class="fas fa-arrow-right"></i></button>
+  </div>
+</section>
+
+<!-- ============================================================ CERTIFICATIONS -->
+<section id="certifications" class="section">
+  <div class="aos">
+    <div class="section-label">Credentials</div>
+    <h2 class="section-title">Certifications <span class="gradient-text">&amp; Courses</span></h2>
+    <p class="section-sub">Hover to pause the scroll. A curated set of IBM and international credentials.</p>
+  </div>
+  <div class="cert-track-wrap aos">
+    <div class="cert-track" id="certTrack">
+      <!-- will be duplicated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ CONTACT -->
+<section id="contact" class="section">
+  <div class="aos">
+    <div class="section-label">Connect</div>
+    <h2 class="section-title">Get in <span class="gradient-text">Touch</span></h2>
+    <p class="section-sub">Whether it's a project, collaboration, or just a hello — my inbox is always open.</p>
+  </div>
+  <div class="contact-grid">
+    <div class="contact-info-card aos">
+      <div>
+        <div class="contact-heading">Let's build something great together</div>
+        <p class="contact-text">I'm currently open to freelance work, full-time roles, and research collaborations in AI, automation, and full-stack development.</p>
+      </div>
+      <div class="contact-item">
+        <div class="contact-item-icon"><i class="fas fa-envelope"></i></div>
+        <div>
+          <div class="contact-item-label">Email</div>
+          <a href="mailto:aliahmedkhoso17081@gmail.com" class="contact-item-val">aliahmedkhoso17081@gmail.com</a>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-item-icon"><i class="fas fa-phone"></i></div>
+        <div>
+          <div class="contact-item-label">Phone</div>
+          <div class="contact-item-val">(+92) 3023415810</div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-item-icon"><i class="fas fa-map-marker-alt"></i></div>
+        <div>
+          <div class="contact-item-label">Location</div>
+          <div class="contact-item-val">Islamabad, Pakistan</div>
+        </div>
+      </div>
+      <div>
+        <div class="contact-item-label" style="margin-bottom:.75rem">Socials</div>
+        <div class="social-row">
+          <a href="https://github.com/Alikhoso81" target="_blank" class="social-btn" title="GitHub"><i class="fab fa-github"></i></a>
+          <a href="https://linkedin.com/in/ali-ahmed-khoso" target="_blank" class="social-btn" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="https://wa.me/923023415810?text=Hi%20Ali,%20I%20viewed%20your%20portfolio%20and%20would%20like%20to%20connect!" target="_blank" class="social-btn" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="mailto:aliahmedkhoso17081@gmail.com" class="social-btn" title="Email"><i class="fas fa-envelope"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="contact-form-card aos" style="transition-delay:.15s">
+      <div class="contact-heading">Send a message</div>
+      <div style="height:1.5rem"></div>
+      <div class="form-group">
+        <label for="fname">Full Name</label>
+        <input type="text" id="fname" placeholder="Your name">
+      </div>
+      <div class="form-group">
+        <label for="femail">Email Address</label>
+        <input type="email" id="femail" placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label for="fmsg">Message</label>
+        <textarea id="fmsg" placeholder="Tell me about your project or inquiry..."></textarea>
+      </div>
+      <button class="btn btn-primary btn-send" onclick="sendMail()">
+        <i class="fas fa-paper-plane"></i> Send Message
+      </button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p class="footer-text">Designed &amp; Built by <span>Ali Ahmed Khoso</span> · 2025 · Islamabad, Pakistan</p>
+</footer>
+
+<!-- WhatsApp FAB -->
+<a href="https://wa.me/923023415810?text=Hi%20Ali,%20I%20viewed%20your%20portfolio%20and%20would%20like%20to%20connect!" target="_blank" class="wa-float" title="Chat on WhatsApp">
+  <i class="fab fa-whatsapp"></i>
+</a>
+
+<script>
+/* ======================================================
+   THEME TOGGLE
+====================================================== */
+const html = document.documentElement;
+const toggle = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+if(saved==='light') html.classList.replace('dark','light');
+
+toggle.addEventListener('click',()=>{
+  const isLight = html.classList.contains('light');
+  html.classList.replace(isLight?'light':'dark', isLight?'dark':'light');
+  localStorage.setItem('theme', isLight?'dark':'light');
+});
+
+/* ======================================================
+   MOBILE DRAWER
+====================================================== */
+const hamburger = document.getElementById('hamburger');
+const drawer = document.getElementById('navDrawer');
+const drawerClose = document.getElementById('drawerClose');
+const drawerLinks = document.querySelectorAll('.drawer-link');
+
+hamburger.addEventListener('click',()=>drawer.classList.add('open'));
+drawerClose.addEventListener('click',()=>drawer.classList.remove('open'));
+drawerLinks.forEach(l=>l.addEventListener('click',()=>drawer.classList.remove('open')));
+
+/* ======================================================
+   ACTIVE NAV LINK ON SCROLL
+====================================================== */
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const onScroll = ()=>{
+  let current='';
+  sections.forEach(s=>{
+    if(window.scrollY >= s.offsetTop - 100) current = s.id;
+  });
+  navLinks.forEach(a=>{
+    a.classList.toggle('active', a.getAttribute('href')==='#'+current);
+  });
+};
+window.addEventListener('scroll', onScroll, {passive:true});
+
+/* ======================================================
+   AOS (scroll reveal)
+====================================================== */
+const aosEls = document.querySelectorAll('.aos');
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting) e.target.classList.add('visible');
+  });
+},{threshold:.12});
+aosEls.forEach(el=>observer.observe(el));
+
+/* ======================================================
+   STAT COUNTER ANIMATION
+====================================================== */
+const statNums = document.querySelectorAll('.stat-num[data-target]');
+const counterObs = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const target = +e.target.dataset.target;
+      let count=0;
+      const step = Math.max(1, Math.floor(target/30));
+      const timer = setInterval(()=>{
+        count = Math.min(count+step, target);
+        e.target.textContent = count+(target>=10?'+':'');
+        if(count>=target) clearInterval(timer);
+      },50);
+      counterObs.unobserve(e.target);
+    }
+  });
+},{threshold:.5});
+statNums.forEach(el=>counterObs.observe(el));
+
+/* ======================================================
+   PROJECTS SLIDER
+====================================================== */
+const track = document.getElementById('projectTrack');
+const cards = track.querySelectorAll('.project-card');
+const dotsContainer = document.getElementById('projDots');
+const CARDS_VISIBLE = ()=> window.innerWidth < 600 ? 1 : window.innerWidth < 900 ? 1 : 2;
+let projIdx = 0;
+
+// Build dots
+cards.forEach((_,i)=>{
+  const d = document.createElement('div');
+  d.className='dot-ind'+(i===0?' active':'');
+  d.addEventListener('click',()=>goTo(i));
+  dotsContainer.appendChild(d);
+});
+
+function getCardWidth(){
+  if(!cards.length) return 0;
+  return cards[0].offsetWidth + 24; // gap=24
+}
+function goTo(idx){
+  const max = cards.length - CARDS_VISIBLE();
+  projIdx = Math.max(0,Math.min(idx,max));
+  track.style.transform=`translateX(-${projIdx*getCardWidth()}px)`;
+  document.querySelectorAll('.dot-ind').forEach((d,i)=>d.classList.toggle('active',i===projIdx));
+}
+document.getElementById('projPrev').addEventListener('click',()=>goTo(projIdx-1));
+document.getElementById('projNext').addEventListener('click',()=>goTo(projIdx+1));
+
+// Touch/swipe
+let touchStart=0;
+track.addEventListener('touchstart',e=>touchStart=e.touches[0].clientX,{passive:true});
+track.addEventListener('touchend',e=>{
+  const diff = touchStart - e.changedTouches[0].clientX;
+  if(Math.abs(diff)>40) goTo(diff>0?projIdx+1:projIdx-1);
+});
+
+window.addEventListener('resize',()=>goTo(projIdx));
+
+/* ======================================================
+   CERTIFICATIONS AUTO-SCROLL
+====================================================== */
+const certs = [
+  {name:'IBM Generative AI Engineering Specialization',issuer:'IBM'},
+  {name:'Fundamentals of AI Agents Using RAG and LangChain',issuer:'IBM'},
+  {name:'Generative AI Advance Fine-Tuning for LLMs',issuer:'IBM'},
+  {name:'Generative AI Engineering and Fine-Tuning Transformers',issuer:'IBM'},
+  {name:'Building Generative AI-Powered Applications with Python',issuer:'IBM'},
+  {name:'Developing AI Applications with Python and Flask',issuer:'IBM'},
+  {name:'Generative AI Language Modeling with Transformers',issuer:'IBM'},
+  {name:'Generative AI and LLMs: Architecture and Data Preparation',issuer:'IBM'},
+  {name:'Generative AI: Prompt Engineering Basics',issuer:'IBM'},
+  {name:'Introduction to Deep Learning & Neural Networks with Keras',issuer:'IBM'},
+  {name:'Machine Learning with Python',issuer:'IBM'},
+  {name:'Data Analysis with Python',issuer:'IBM'},
+  {name:'Python for Data Science, AI & Development',issuer:'IBM'},
+  {name:'Introduction to Artificial Intelligence (AI)',issuer:'IBM'},
+  {name:'Chinese Proficiency Test HSK Level 1',issuer:'Chinese Testing International'},
+  {name:'Capital Youth Expo\'23 Ambassador',issuer:'Capital Youth Expo'},
+  {name:'Youth Leadership Convention',issuer:'Youth Leadership Convention'},
+];
+
+function buildCertCard(c){
+  return `<div class="cert-card">
+    <div class="cert-issuer"><i class="fas fa-award cert-icon"></i> ${c.issuer}</div>
+    <div class="cert-name">${c.name}</div>
+  </div>`;
+}
+const certTrack = document.getElementById('certTrack');
+// Duplicate for seamless loop
+const allCerts = [...certs,...certs];
+certTrack.innerHTML = allCerts.map(buildCertCard).join('');
+
+/* ======================================================
+   CONTACT FORM → MAILTO
+====================================================== */
+function sendMail(){
+  const name = document.getElementById('fname').value.trim();
+  const email = document.getElementById('femail').value.trim();
+  const msg = document.getElementById('fmsg').value.trim();
+  if(!name||!email||!msg){alert('Please fill in all fields.');return;}
+  const subject = encodeURIComponent(`Portfolio Contact from ${name}`);
+  const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${msg}`);
+  window.location.href=`mailto:aliahmedkhoso17081@gmail.com?subject=${subject}&body=${body}`;
+}
+
+/* ======================================================
+   TILT ON PROJECT CARDS
+====================================================== */
+document.querySelectorAll('.project-card').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX-r.left)/r.width-.5;
+    const y = (e.clientY-r.top)/r.height-.5;
+    card.style.transform=`perspective(600px) rotateY(${x*8}deg) rotateX(${-y*8}deg) translateY(-6px)`;
+  });
+  card.addEventListener('mouseleave',()=>{
+    card.style.transform='';
+  });
+});
+</script>
+</body>
+</html>
