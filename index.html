@@ -582,6 +582,31 @@ footer{
   .hero-stats{gap:1.5rem}
   .section{padding:70px 5%}
 }
+
+/* GitHub-powered project covers and image gallery; inherits portfolio theme */
+.project-media{position:relative;width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;margin:0 0 1.15rem;padding:0;overflow:hidden;border:1px solid var(--border2);border-radius:12px;background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(139,92,246,.1));color:var(--text);cursor:pointer}
+.project-media:hover{border-color:var(--indigo)}
+.project-media .project-icon{margin:0;flex-shrink:0}
+.project-media.has-image .project-icon{display:none}
+.project-cover-image{width:100%;height:100%;object-fit:cover;display:block}
+.project-image-count{position:absolute;right:.5rem;bottom:.5rem;color:#fff;background:rgba(15,23,42,.82);font-size:.68rem;font-weight:600;padding:.3rem .55rem;border-radius:6px;backdrop-filter:blur(6px)}
+.project-media:focus-visible,.project-gallery-dialog button:focus-visible{outline:2px solid var(--indigo);outline-offset:3px}
+.slider-dots{max-width:min(55vw,330px);overflow-x:auto;scrollbar-width:thin;padding:5px 0}
+.dot-ind{flex-shrink:0;border:0;padding:0}
+.project-extra-links{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin-top:.4rem}
+.project-gallery-dialog{width:min(940px,94vw);max-width:94vw;max-height:90vh;overflow:auto;border:1px solid var(--border2);border-radius:var(--radius-lg);padding:1.3rem;background:var(--surface);color:var(--text);box-shadow:0 22px 80px rgba(0,0,0,.35)}
+.project-gallery-dialog::backdrop{background:rgba(5,9,23,.8);backdrop-filter:blur(5px)}
+.project-gallery-top{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:.75rem}
+.project-gallery-top h3{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;line-height:1.4}
+.project-gallery-message,.project-gallery-count{font-size:.8rem;color:var(--text-muted);margin:.5rem 0}
+.project-gallery-view{display:flex;gap:.5rem;justify-content:space-between;align-items:center;min-height:210px}
+.project-gallery-main{max-width:calc(100% - 98px);max-height:56vh;min-height:110px;object-fit:contain;border-radius:8px}
+.project-gallery-thumbs{display:flex;gap:.5rem;overflow-x:auto;margin-top:.8rem;padding:.4rem 0}
+.project-gallery-thumb{border:2px solid transparent;flex:0 0 auto;width:82px;height:62px;border-radius:8px;overflow:hidden;padding:0;background:var(--surface2);cursor:pointer}
+.project-gallery-thumb.active{border-color:var(--indigo)}
+.project-gallery-thumb img{height:100%;width:100%;object-fit:cover}
+@media(max-width:600px){.project-gallery-dialog{padding:.75rem}.project-gallery-main{max-width:calc(100% - 76px)}.project-gallery-view .slider-btn{width:34px;height:34px;flex-shrink:0}}
+
 </style>
 </head>
 <body>
@@ -652,7 +677,7 @@ footer{
       </div>
       <div class="hero-stats">
         <div class="stat-item">
-          <div class="stat-num" data-target="14">0</div>
+          <div class="stat-num" id="projectStatCount" data-target="14">0</div>
           <div class="stat-label">Projects Built</div>
         </div>
         <div class="stat-item">
@@ -867,7 +892,7 @@ footer{
   <div class="aos">
     <div class="section-label">Portfolio</div>
     <h2 class="section-title">Featured <span class="gradient-text">Projects</span></h2>
-    <p class="section-sub">14 projects — swipe or use arrows to explore. Each built end-to-end with production-ready code.</p>
+    <p class="section-sub" id="projectSubtitle">14 featured projects — swipe or use arrows to explore.</p>
   </div>
   <div class="slider-wrapper" id="projectSlider">
     <div class="slider-track" id="projectTrack">
@@ -1229,44 +1254,386 @@ const counterObs = new IntersectionObserver((entries)=>{
 statNums.forEach(el=>counterObs.observe(el));
 
 /* ======================================================
-   PROJECTS SLIDER
+   PROJECTS SLIDER — automatic public GitHub repositories
+   Existing hand-written cards remain available if the API is down.
 ====================================================== */
+const GITHUB_OWNER = 'Alikhoso81';
 const track = document.getElementById('projectTrack');
-const cards = track.querySelectorAll('.project-card');
+const sliderWrapper = document.getElementById('projectSlider');
 const dotsContainer = document.getElementById('projDots');
-const CARDS_VISIBLE = ()=> window.innerWidth < 600 ? 1 : window.innerWidth < 900 ? 1 : 2;
+const projectSubtitle = document.getElementById('projectSubtitle');
+const curatedCards = new Map();
+const repoForCard = new WeakMap();
+const imagePromises = new Map();
+let cards = [];
 let projIdx = 0;
+let imageObserver = null;
 
-// Build dots
-cards.forEach((_,i)=>{
-  const d = document.createElement('div');
-  d.className='dot-ind'+(i===0?' active':'');
-  d.addEventListener('click',()=>goTo(i));
-  dotsContainer.appendChild(d);
+// Save the original hand-written cards, titles and tool badges as fallbacks.
+Array.from(track.querySelectorAll('.project-card')).forEach(function(card) {
+  const link = card.querySelector('.project-link');
+  if (!link) return;
+  try {
+    const parts = new URL(link.href).pathname.split('/').filter(Boolean);
+    if (parts[0].toLowerCase() === GITHUB_OWNER.toLowerCase() && parts[1]) {
+      curatedCards.set(parts[1].toLowerCase(), card.cloneNode(true));
+    }
+  } catch (err) { /* leave unrelated links alone */ }
 });
 
-function getCardWidth(){
-  if(!cards.length) return 0;
-  return cards[0].offsetWidth + 24; // gap=24
+function safeUrl(value) {
+  try {
+    const url = new URL(value);
+    return (url.protocol === 'https:' || url.protocol === 'http:') ? url.href : null;
+  } catch (err) { return null; }
 }
-function goTo(idx){
-  const max = cards.length - CARDS_VISIBLE();
-  projIdx = Math.max(0,Math.min(idx,max));
-  track.style.transform=`translateX(-${projIdx*getCardWidth()}px)`;
-  document.querySelectorAll('.dot-ind').forEach((d,i)=>d.classList.toggle('active',i===projIdx));
+function readableRepoName(name) {
+  return name.replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
-document.getElementById('projPrev').addEventListener('click',()=>goTo(projIdx-1));
-document.getElementById('projNext').addEventListener('click',()=>goTo(projIdx+1));
+function projectCardWidth() {
+  if (!cards.length) return 0;
+  const gap = parseFloat(getComputedStyle(track).gap) || 0;
+  return cards[0].getBoundingClientRect().width + gap;
+}
+function visibleCardCount() {
+  const width = projectCardWidth();
+  return width ? Math.max(1, Math.min(2, Math.floor((sliderWrapper.clientWidth + 1) / width))) : 1;
+}
+function goTo(idx) {
+  const maximum = Math.max(0, cards.length - visibleCardCount());
+  projIdx = Math.max(0, Math.min(idx, maximum));
+  track.style.transform = 'translateX(-' + (projIdx * projectCardWidth()) + 'px)';
+  Array.from(dotsContainer.children).forEach(function(dot, index) {
+    const active = index === projIdx;
+    dot.classList.toggle('active', active);
+    dot.setAttribute('aria-current', active ? 'true' : 'false');
+  });
+}
+function rebuildSlider() {
+  cards = Array.from(track.querySelectorAll('.project-card'));
+  dotsContainer.replaceChildren();
+  const dotCount = Math.max(1, cards.length - visibleCardCount() + 1);
+  for (let index = 0; index < dotCount; index++) {
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'dot-ind';
+    dot.setAttribute('aria-label', 'Go to project ' + (index + 1));
+    dot.addEventListener('click', function() { goTo(index); });
+    dotsContainer.appendChild(dot);
+  }
+  goTo(0);
+  initProjectTilts();
+}
+document.getElementById('projPrev').addEventListener('click', function() { goTo(projIdx - 1); });
+document.getElementById('projNext').addEventListener('click', function() { goTo(projIdx + 1); });
+let touchStart = null;
+track.addEventListener('touchstart', function(event) { touchStart = event.touches[0].clientX; }, {passive:true});
+track.addEventListener('touchend', function(event) {
+  if (touchStart === null) return;
+  const diff = touchStart - event.changedTouches[0].clientX;
+  if (Math.abs(diff) > 40) goTo(projIdx + (diff > 0 ? 1 : -1));
+  touchStart = null;
+}, {passive:true});
+window.addEventListener('resize', function() { rebuildSliderDotsOnResize(); });
+function rebuildSliderDotsOnResize() {
+  const previous = projIdx;
+  cards = Array.from(track.querySelectorAll('.project-card'));
+  dotsContainer.replaceChildren();
+  const dotCount = Math.max(1, cards.length - visibleCardCount() + 1);
+  for (let index = 0; index < dotCount; index++) {
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'dot-ind';
+    dot.setAttribute('aria-label', 'Go to project ' + (index + 1));
+    dot.addEventListener('click', function() { goTo(index); });
+    dotsContainer.appendChild(dot);
+  }
+  goTo(previous);
+}
+function initProjectTilts() {
+  cards.forEach(function(card) {
+    if (card.dataset.tiltReady) return;
+    card.dataset.tiltReady = 'true';
+    card.addEventListener('mousemove', function(event) {
+      const rect = card.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width - .5;
+      const y = (event.clientY - rect.top) / rect.height - .5;
+      card.style.transform = 'perspective(600px) rotateY(' + (x * 8) + 'deg) rotateX(' + (-y * 8) + 'deg) translateY(-6px)';
+    });
+    card.addEventListener('mouseleave', function() { card.style.transform = ''; });
+  });
+}
 
-// Touch/swipe
-let touchStart=0;
-track.addEventListener('touchstart',e=>touchStart=e.touches[0].clientX,{passive:true});
-track.addEventListener('touchend',e=>{
-  const diff = touchStart - e.changedTouches[0].clientX;
-  if(Math.abs(diff)>40) goTo(diff>0?projIdx+1:projIdx-1);
+// GitHub's public API is used without placing any token in browser code.
+async function listGitHubProjects() {
+  const repos = [];
+  for (let page = 1; page <= 30; page++) {
+    const response = await fetch('https://api.github.com/users/' + encodeURIComponent(GITHUB_OWNER) + '/repos?per_page=100&sort=created&direction=desc&page=' + page, {headers:{Accept:'application/vnd.github+json'}});
+    if (!response.ok) throw new Error('GitHub repositories could not load (HTTP ' + response.status + ')');
+    const batch = await response.json();
+    if (!Array.isArray(batch)) throw new Error('Unexpected GitHub response.');
+    repos.push.apply(repos, batch);
+    if (batch.length < 100) break;
+  }
+  return repos.filter(function(repo) {
+    const name = repo.name.toLowerCase();
+    return !repo.private && name !== 'portfolio' && name !== GITHUB_OWNER.toLowerCase();
+  });
+}
+function buildProjectCard(repo, index, total) {
+  const card = (curatedCards.get(repo.name.toLowerCase()) || document.createElement('div')).cloneNode(true);
+  card.classList.add('project-card');
+  card.removeAttribute('data-tilt-ready');
+  let number = card.querySelector('.project-num');
+  if (!number) {
+    number = document.createElement('div');
+    number.className = 'project-num';
+    card.prepend(number);
+  }
+  number.textContent = String(index + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+  let title = card.querySelector('.project-title');
+  if (!title) {
+    title = document.createElement('div');
+    title.className = 'project-title';
+    card.appendChild(title);
+    title.textContent = readableRepoName(repo.name);
+  }
+  let desc = card.querySelector('.project-desc');
+  if (!desc) {
+    desc = document.createElement('div');
+    desc.className = 'project-desc';
+    card.appendChild(desc);
+    desc.textContent = repo.description || 'Explore this project, its source code and documentation on GitHub.';
+  }
+  let badges = card.querySelector('.project-tools');
+  if (!badges) {
+    badges = document.createElement('div');
+    badges.className = 'project-tools';
+    card.appendChild(badges);
+    const topics = Array.isArray(repo.topics) ? repo.topics : [];
+    const labels = [repo.language].concat(topics).filter(Boolean).slice(0, 6);
+    labels.forEach(function(label) {
+      const span = document.createElement('span');
+      span.className = 'tool-badge';
+      span.textContent = label;
+      badges.appendChild(span);
+    });
+  }
+  let link = card.querySelector('.project-link');
+  if (!link) {
+    link = document.createElement('a');
+    link.className = 'project-link';
+    link.textContent = 'View on GitHub →';
+    card.appendChild(link);
+  }
+  link.href = repo.html_url;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  if (safeUrl(repo.homepage) && !card.querySelector('.project-demo-link')) {
+    const demo = document.createElement('a');
+    demo.className = 'project-link project-demo-link';
+    demo.href = safeUrl(repo.homepage);
+    demo.target = '_blank';
+    demo.rel = 'noopener noreferrer';
+    demo.textContent = 'Live Demo ↗';
+    card.appendChild(demo);
+  }
+  const media = document.createElement('button');
+  media.type = 'button';
+  media.className = 'project-media';
+  media.setAttribute('aria-label', 'View screenshots for ' + title.textContent);
+  const existingIcon = card.querySelector('.project-icon');
+  if (existingIcon) {
+    media.appendChild(existingIcon);
+  } else {
+    const icon = document.createElement('div');
+    icon.className = 'project-icon';
+    const symbol = document.createElement('i');
+    symbol.className = 'fas fa-code';
+    icon.appendChild(symbol);
+    media.appendChild(icon);
+  }
+  number.after(media);
+  media.addEventListener('click', function() { openProjectGallery(repo, title.textContent); });
+  repoForCard.set(card, repo);
+  return card;
+}
+function imageRank(path) {
+  if (/(^|\/)(cover|thumbnail|preview|hero)\.(png|jpe?g|webp|gif|avif|svg)$/i.test(path)) return 0;
+  if (/(^|\/)(screenshots?|screen-shots?)(\/|$)/i.test(path)) return 1;
+  if (/(^|\/)(dashboard|home|main|overview|poster)\./i.test(path)) return 2;
+  return 3;
+}
+function imageUrl(repo, path) {
+  const branch = repo.default_branch.split('/').map(encodeURIComponent).join('/');
+  const file = path.split('/').map(encodeURIComponent).join('/');
+  return 'https://raw.githubusercontent.com/' + encodeURIComponent(repo.owner.login) + '/' + encodeURIComponent(repo.name) + '/' + branch + '/' + file;
+}
+async function getRepositoryImages(repo) {
+  const key = String(repo.id) + ':' + repo.default_branch + ':' + repo.pushed_at;
+  if (imagePromises.has(key)) return imagePromises.get(key);
+  const promise = (async function() {
+    const cacheKey = 'portfolio:images:' + repo.id;
+    try {
+      const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+      if (cached && cached.version === key && Date.now() - cached.time < 86400000 && Array.isArray(cached.paths)) return cached.paths;
+    } catch (err) { /* storage may be blocked */ }
+    const endpoint = 'https://api.github.com/repos/' + encodeURIComponent(repo.owner.login) + '/' + encodeURIComponent(repo.name) + '/git/trees/' + encodeURIComponent(repo.default_branch) + '?recursive=1';
+    const response = await fetch(endpoint, {headers:{Accept:'application/vnd.github+json'}});
+    if (!response.ok) throw new Error('GitHub images could not load (HTTP ' + response.status + ')');
+    const tree = await response.json();
+    if (!Array.isArray(tree.tree)) throw new Error('GitHub file listing was unavailable.');
+    if (tree.truncated) console.warn('GitHub image listing was truncated for ' + repo.name);
+    const paths = tree.tree.filter(function(entry) {
+      return entry.type === 'blob' && /\.(png|jpe?g|webp|gif|avif|svg)$/i.test(entry.path) &&
+        !/(^|\/)(node_modules|\.git|\.venv|venv|vendor|build|dist)(\/|$)/i.test(entry.path);
+    }).map(function(entry) { return entry.path; }).sort(function(a, b) {
+      return imageRank(a) - imageRank(b) || a.localeCompare(b);
+    });
+    try { localStorage.setItem(cacheKey, JSON.stringify({version:key,time:Date.now(),paths:paths})); } catch (err) { /* quota or privacy restrictions */ }
+    return paths;
+  })();
+  imagePromises.set(key, promise);
+  promise.catch(function() { imagePromises.delete(key); });
+  return promise;
+}
+async function hydrateProjectCover(card, repo) {
+  const media = card.querySelector('.project-media');
+  if (!media || media.dataset.imageReady) return;
+  media.dataset.imageReady = 'true';
+  let paths;
+  try { paths = await getRepositoryImages(repo); }
+  catch (err) { console.warn('Could not fetch screenshots for ' + repo.name, err); return; }
+  if (!paths.length || !card.isConnected) return;
+  const photo = document.createElement('img');
+  photo.className = 'project-cover-image';
+  photo.loading = 'lazy';
+  photo.decoding = 'async';
+  photo.alt = 'Screenshot of ' + readableRepoName(repo.name);
+  photo.src = imageUrl(repo, paths[0]);
+  photo.addEventListener('error', function() { photo.remove(); media.classList.remove('has-image'); });
+  media.prepend(photo);
+  media.classList.add('has-image');
+  const count = document.createElement('span');
+  count.className = 'project-image-count';
+  count.textContent = paths.length + (paths.length === 1 ? ' image' : ' images') + ' · View gallery';
+  media.appendChild(count);
+}
+function observeProjectImages() {
+  if (imageObserver) imageObserver.disconnect();
+  if ('IntersectionObserver' in window) {
+    imageObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (!entry.isIntersecting) return;
+        imageObserver.unobserve(entry.target);
+        const repo = repoForCard.get(entry.target);
+        if (repo) hydrateProjectCover(entry.target, repo);
+      });
+    }, {rootMargin:'200px 400px'});
+    cards.forEach(function(card) { imageObserver.observe(card); });
+  } else {
+    cards.forEach(function(card) { const repo = repoForCard.get(card); if (repo) hydrateProjectCover(card, repo); });
+  }
+}
+
+// Native modal: one hero image with a strip of EVERY image found in the repo.
+const gallery = document.createElement('dialog');
+gallery.className = 'project-gallery-dialog';
+gallery.setAttribute('aria-label', 'Project screenshot gallery');
+gallery.innerHTML = '<div class="project-gallery-top"><h3 id="galleryTitle"></h3><button type="button" class="slider-btn" id="galleryClose" aria-label="Close gallery"><i class="fas fa-times"></i></button></div>' +
+  '<p id="galleryMessage" class="project-gallery-message" role="status"></p>' +
+  '<div id="galleryView" class="project-gallery-view" hidden><button type="button" class="slider-btn" id="galleryPrev" aria-label="Previous image"><i class="fas fa-arrow-left"></i></button><img id="galleryMain" class="project-gallery-main" alt=""><button type="button" class="slider-btn" id="galleryNext" aria-label="Next image"><i class="fas fa-arrow-right"></i></button></div>' +
+  '<div id="galleryCount" class="project-gallery-count"></div><div id="galleryThumbs" class="project-gallery-thumbs"></div>';
+document.body.appendChild(gallery);
+const galleryTitle = document.getElementById('galleryTitle');
+const galleryMessage = document.getElementById('galleryMessage');
+const galleryView = document.getElementById('galleryView');
+const galleryMain = document.getElementById('galleryMain');
+const galleryCount = document.getElementById('galleryCount');
+const galleryThumbs = document.getElementById('galleryThumbs');
+let galleryRepo = null;
+let galleryPaths = [];
+let galleryIndex = 0;
+let galleryRequest = 0;
+function showGalleryImage(index) {
+  if (!galleryPaths.length) return;
+  galleryIndex = (index + galleryPaths.length) % galleryPaths.length;
+  galleryMain.src = imageUrl(galleryRepo, galleryPaths[galleryIndex]);
+  galleryMain.alt = 'Project image ' + (galleryIndex + 1) + ': ' + galleryPaths[galleryIndex];
+  galleryCount.textContent = (galleryIndex + 1) + ' of ' + galleryPaths.length + ' images · ' + galleryPaths[galleryIndex];
+  Array.from(galleryThumbs.children).forEach(function(btn, i) {
+    btn.classList.toggle('active', i === galleryIndex);
+    btn.setAttribute('aria-pressed', i === galleryIndex ? 'true' : 'false');
+    if (i === galleryIndex) btn.scrollIntoView({block:'nearest',inline:'nearest'});
+  });
+}
+async function openProjectGallery(repo, displayName) {
+  const requestId = ++galleryRequest;
+  galleryRepo = repo;
+  galleryTitle.textContent = displayName + ' — Screenshots';
+  galleryMessage.textContent = 'Loading images from GitHub...';
+  galleryView.hidden = true;
+  galleryThumbs.replaceChildren();
+  galleryCount.textContent = '';
+  galleryPaths = [];
+  if (!gallery.open) gallery.showModal();
+  try {
+    const paths = await getRepositoryImages(repo);
+    if (requestId !== galleryRequest || !gallery.open) return;
+    galleryPaths = paths;
+    if (!paths.length) {
+      galleryMessage.textContent = 'No image files found in this repository yet. Add screenshots to your GitHub repo to show them here.';
+      return;
+    }
+    galleryMessage.textContent = '';
+    galleryView.hidden = false;
+    paths.forEach(function(path, i) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'project-gallery-thumb';
+      button.setAttribute('aria-label', 'View image ' + (i + 1) + ': ' + path);
+      const thumb = document.createElement('img');
+      thumb.loading = 'lazy';
+      thumb.alt = path;
+      thumb.src = imageUrl(repo, path);
+      button.appendChild(thumb);
+      button.addEventListener('click', function() { showGalleryImage(i); });
+      galleryThumbs.appendChild(button);
+    });
+    showGalleryImage(0);
+  } catch (err) {
+    if (requestId === galleryRequest) galleryMessage.textContent = 'Could not load GitHub images right now. Please try again later.';
+  }
+}
+document.getElementById('galleryClose').addEventListener('click', function() { gallery.close(); });
+document.getElementById('galleryPrev').addEventListener('click', function() { showGalleryImage(galleryIndex - 1); });
+document.getElementById('galleryNext').addEventListener('click', function() { showGalleryImage(galleryIndex + 1); });
+gallery.addEventListener('click', function(event) { if (event.target === gallery) gallery.close(); });
+gallery.addEventListener('close', function() { ++galleryRequest; });
+gallery.addEventListener('keydown', function(event) {
+  if (event.key === 'ArrowLeft') { event.preventDefault(); showGalleryImage(galleryIndex - 1); }
+  if (event.key === 'ArrowRight') { event.preventDefault(); showGalleryImage(galleryIndex + 1); }
 });
 
-window.addEventListener('resize',()=>goTo(projIdx));
+async function refreshGitHubProjects() {
+  try {
+    const repos = await listGitHubProjects();
+    if (!repos.length) throw new Error('No public project repositories found.');
+    const fragment = document.createDocumentFragment();
+    repos.forEach(function(repo, index) { fragment.appendChild(buildProjectCard(repo, index, repos.length)); });
+    track.replaceChildren(fragment);
+    projectSubtitle.textContent = repos.length + ' GitHub projects — newest first. Swipe or use arrows to explore, and tap a project picture to view every image.';
+    const stat = document.getElementById('projectStatCount');
+    if (stat) { stat.dataset.target = String(repos.length); stat.textContent = repos.length + '+'; }
+    rebuildSlider();
+    observeProjectImages();
+  } catch (err) {
+    console.warn('GitHub project sync failed; preserving original project cards.', err);
+    projectSubtitle.textContent = 'Featured projects — swipe or use arrows to explore. Live GitHub updates are temporarily unavailable.';
+  }
+}
+rebuildSlider(); // Static cards work immediately, even if GitHub is unreachable.
+refreshGitHubProjects();
 
 /* ======================================================
    CERTIFICATIONS AUTO-SCROLL
@@ -1315,20 +1682,6 @@ function sendMail(){
   window.location.href=`mailto:aliahmedkhoso17081@gmail.com?subject=${subject}&body=${body}`;
 }
 
-/* ======================================================
-   TILT ON PROJECT CARDS
-====================================================== */
-document.querySelectorAll('.project-card').forEach(card=>{
-  card.addEventListener('mousemove',e=>{
-    const r = card.getBoundingClientRect();
-    const x = (e.clientX-r.left)/r.width-.5;
-    const y = (e.clientY-r.top)/r.height-.5;
-    card.style.transform=`perspective(600px) rotateY(${x*8}deg) rotateX(${-y*8}deg) translateY(-6px)`;
-  });
-  card.addEventListener('mouseleave',()=>{
-    card.style.transform='';
-  });
-});
 </script>
 </body>
 </html>
