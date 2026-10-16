@@ -608,41 +608,20 @@ footer{
 @media(max-width:600px){.project-gallery-dialog{padding:.75rem}.project-gallery-main{max-width:calc(100% - 76px)}.project-gallery-view .slider-btn{width:34px;height:34px;flex-shrink:0}}
 
 
-/* Image upload shortcut shown when the portfolio URL contains ?manage=1 */
+/* GitHub upload shortcut available in manage mode */
 .project-upload-link{margin-top:.75rem;align-self:flex-start;border:1px dashed var(--indigo);border-radius:8px;padding:.55rem .75rem;font-weight:600}
 .project-upload-link:hover{background:var(--surface2)}
 
 
-/* Screenshot uploader — visible only with ?manage=1 */
+/* On GitHub upload links are visible only with ?manage=1 */
 .project-media-frame{position:relative;margin-bottom:1.15rem}
 .project-media-frame .project-media{margin-bottom:0}
-.project-media-upload{position:absolute;top:.6rem;right:.6rem;z-index:1;background:rgba(21,26,47,.94);color:#fff;border:1px solid rgba(255,255,255,.3);padding:.5rem .7rem;border-radius:9px;cursor:pointer;font-size:.76rem;font-weight:700;display:flex;align-items:center;gap:.4rem;box-shadow:0 3px 12px rgba(0,0,0,.25)}
-.project-media-upload:hover{background:var(--indigo)}
-.project-upload-link{background:transparent;color:var(--indigo);font:inherit;cursor:pointer}
-.project-manage-hint{display:flex;gap:.6rem;align-items:center;margin-top:.8rem;color:var(--text-muted);font-size:.8rem}
+.project-media-upload{position:absolute;top:.6rem;right:.6rem;z-index:1;background:rgba(21,26,47,.94);color:#fff;border:1px solid rgba(255,255,255,.3);padding:.5rem .7rem;border-radius:9px;cursor:pointer;font-size:.76rem;font-weight:700;display:flex;align-items:center;gap:.4rem;box-shadow:0 3px 12px rgba(0,0,0,.25);text-decoration:none}
+.project-media-upload:hover{background:var(--indigo);color:#fff}
+.project-media-upload:focus-visible,.project-upload-link:focus-visible{outline:2px solid var(--indigo);outline-offset:3px}
+.project-upload-link{font:inherit;color:var(--indigo);text-decoration:none}
+.project-manage-hint{display:flex;gap:.6rem;align-items:center;margin-top:.8rem;color:var(--text-muted);font-size:.8rem;line-height:1.6}
 .project-manage-hint i{color:var(--indigo)}
-.owner-upload-dialog{width:min(560px,96vw);max-height:92vh;overflow:auto;background:var(--surface);color:var(--text);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:0 20px 80px rgba(0,0,0,.42)}
-.owner-upload-dialog::backdrop{background:rgba(7,10,25,.78);backdrop-filter:blur(5px)}
-.owner-upload-title{font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700;margin:0}
-.owner-upload-section{margin:1rem 0;display:flex;flex-direction:column;gap:.65rem}
-.owner-upload-section[hidden]{display:none}
-.owner-upload-label{font-size:.82rem;font-weight:600;color:var(--text)}
-.owner-upload-input{display:block;width:100%;max-width:100%;background:var(--surface2);color:var(--text);padding:.65rem .7rem;border:1px solid var(--border2);border-radius:8px;font:inherit}
-.owner-upload-help{font-size:.77rem;line-height:1.65;color:var(--text-muted)}
-.owner-upload-actions{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap}
-.owner-upload-btn{background:var(--accent-grd);color:white;font:inherit;font-size:.84rem;font-weight:650;border:0;border-radius:9px;padding:.7rem 1rem;cursor:pointer}
-.owner-upload-btn:hover{filter:brightness(1.1)}
-.owner-upload-btn:disabled{cursor:wait;filter:grayscale(.6);opacity:.7}
-.owner-upload-outline{background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:9px;padding:.6rem .8rem;cursor:pointer;font:inherit;font-size:.8rem}
-.owner-upload-status{font-size:.8rem;line-height:1.55;min-height:1.35rem;color:var(--text-muted);white-space:pre-line}
-.owner-upload-status[data-state="error"]{color:#ef6666}
-.owner-upload-status[data-state="success"]{color:#34b983}
-.owner-upload-preview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;margin:.5rem 0}
-.owner-upload-preview img{width:100%;height:100px;object-fit:cover;border:1px solid var(--border2);border-radius:9px;background:var(--surface2)}
-.owner-upload-checkbox{display:flex;gap:.5rem;align-items:center;font-size:.8rem}
-.owner-upload-verified{display:flex;align-items:center;gap:.5rem;color:#34b983;font-size:.8rem;font-weight:600}
-.owner-upload-dialog a{color:var(--indigo);text-decoration:underline;text-underline-offset:2px}
-@media(max-width:600px){.owner-upload-dialog{padding:1rem}.owner-upload-preview img{height:75px}}
 
 </style>
 </head>
@@ -1475,15 +1454,16 @@ function buildProjectCard(repo, index, total) {
     demo.textContent = 'Live Demo ↗';
     card.appendChild(demo);
   }
-  // Image management is visible only on the owner-mode URL; real write access
-  // is checked using GitHub's authenticated API, never through this UI flag.
+  // Upload controls are shown only with ?manage=1; GitHub enforces permissions.
   const imageManageMode = new URLSearchParams(window.location.search).get('manage') === '1';
   if (imageManageMode) {
-    const uploadLink = document.createElement('button');
-    uploadLink.type = 'button';
+    const uploadLink = document.createElement('a');
     uploadLink.className = 'project-link project-upload-link';
-    uploadLink.innerHTML = '<i class="fas fa-upload"></i> Add Image';
-    uploadLink.addEventListener('click', function() { openOwnerUploader(repo); });
+    uploadLink.href = githubUploadUrl(repo);
+    uploadLink.target = '_blank';
+    uploadLink.rel = 'noopener noreferrer';
+    uploadLink.innerHTML = '<i class="fab fa-github"></i> Add Image on GitHub <i class="fas fa-external-link-alt"></i>';
+    uploadLink.title = 'Sign in to GitHub and commit a screenshot to this project.';
     card.appendChild(uploadLink);
   }
   const media = document.createElement('button');
@@ -1505,12 +1485,14 @@ function buildProjectCard(repo, index, total) {
   mediaFrame.className = 'project-media-frame';
   mediaFrame.appendChild(media);
   if (imageManageMode) {
-    const addImage = document.createElement('button');
-    addImage.type = 'button';
+    const addImage = document.createElement('a');
     addImage.className = 'project-media-upload';
+    addImage.href = githubUploadUrl(repo);
+    addImage.target = '_blank';
+    addImage.rel = 'noopener noreferrer';
     addImage.innerHTML = '<i class="fas fa-plus"></i> Add Image';
-    addImage.setAttribute('aria-label', 'Add image to ' + title.textContent);
-    addImage.addEventListener('click', function() { openOwnerUploader(repo); });
+    addImage.setAttribute('aria-label', 'Upload an image on GitHub for ' + title.textContent);
+    addImage.title = 'Use your normal GitHub sign-in; no access token needed.';
     mediaFrame.appendChild(addImage);
   }
   number.after(mediaFrame);
@@ -1775,228 +1757,17 @@ gallery.addEventListener('keydown', function(event) {
 });
 
 
-/* ======================================================
-   OWNER SCREENSHOT UPLOAD — GitHub API, short-lived token
-   Static GitHub Pages cannot safely implement OAuth by itself.
-   Token remains only in JS memory, never localStorage or website source.
-====================================================== */
-let ownerGitHubToken = null;
-let ownerGitHubLogin = null;
-let ownerUploadRepo = null;
-let ownerUploadBusy = false;
-let ownerPreviewObjectUrls = [];
-const ownerUploadDialog = document.createElement('dialog');
-ownerUploadDialog.className = 'owner-upload-dialog';
-ownerUploadDialog.setAttribute('aria-labelledby','ownerUploadTitle');
-ownerUploadDialog.innerHTML =
-  '<div class="project-gallery-top"><h3 class="owner-upload-title" id="ownerUploadTitle">Add project screenshots</h3><button type="button" class="slider-btn" id="ownerUploadClose" aria-label="Close upload"><i class="fas fa-times"></i></button></div>' +
-  '<p class="owner-upload-help">Repository: <strong id="ownerUploadRepoName"></strong></p>' +
-  '<div class="owner-upload-section" id="ownerAuthSection">' +
-    '<label class="owner-upload-label" for="ownerTokenInput">Verify your GitHub account</label>' +
-    '<input type="password" class="owner-upload-input" id="ownerTokenInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Paste fine-grained GitHub access token" />' +
-    '<div class="owner-upload-actions"><button class="owner-upload-btn" type="button" id="ownerVerify">Verify account</button>' +
-    '<a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">Create limited GitHub token ↗</a></div>' +
-    '<p class="owner-upload-help">For a direct upload, create a <strong>fine-grained personal access token</strong> for your account. Select the project repositories you want to update, grant <strong>Contents: Read and write</strong>, and choose a short expiration. This website never saves your token in storage or commits it to GitHub. Never enter your GitHub password here.</p>' +
-  '</div>' +
-  '<div class="owner-upload-section" id="ownerFileSection" hidden>' +
-    '<div class="owner-upload-verified"><i class="fas fa-check-circle"></i> Verified as <span id="ownerVerifiedLogin"></span> <button class="owner-upload-outline" type="button" id="ownerDisconnect" style="margin-left:auto">Disconnect</button></div>' +
-    '<label class="owner-upload-label" for="ownerImageFiles">Select images (PNG, JPEG, WebP, GIF)</label>' +
-    '<input class="owner-upload-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif" id="ownerImageFiles" multiple />' +
-    '<p class="owner-upload-help">Up to 8 images at once, 5 MB each. Files are saved to the selected project\'s <code>screenshots/</code> folder on GitHub.</p>' +
-    '<label class="owner-upload-checkbox"><input type="checkbox" id="ownerUseCover" checked /> Make the first uploaded image the project cover</label>' +
-    '<div class="owner-upload-preview" id="ownerImagePreview"></div>' +
-    '<button class="owner-upload-btn" type="button" id="ownerUploadSubmit">Upload images directly to GitHub</button>' +
-  '</div>' +
-  '<p id="ownerUploadStatus" class="owner-upload-status" role="status" aria-live="polite"></p>' +
-  '<p class="owner-upload-help">Prefer regular GitHub sign-in? <a id="ownerOpenGitHub" target="_blank" rel="noopener noreferrer">Upload on GitHub instead ↗</a>. No token is needed with that option.</p>';
-document.body.appendChild(ownerUploadDialog);
-const ownerTokenInput = document.getElementById('ownerTokenInput');
-const ownerVerifyBtn = document.getElementById('ownerVerify');
-const ownerSubmitBtn = document.getElementById('ownerUploadSubmit');
-const ownerImageFiles = document.getElementById('ownerImageFiles');
-const ownerImagePreview = document.getElementById('ownerImagePreview');
-const ownerUploadStatus = document.getElementById('ownerUploadStatus');
-function ownerStatus(message, state) {
-  ownerUploadStatus.textContent = message;
-  ownerUploadStatus.dataset.state = state || '';
+// Management shortcuts require no token on this site.
+// GitHub handles login and checks write permissions at its own upload page.
+function githubUploadUrl(repo) {
+  const branch = repo.default_branch.split('/').map(encodeURIComponent).join('/');
+  return 'https://github.com/' + encodeURIComponent(repo.owner.login) + '/' +
+    encodeURIComponent(repo.name) + '/upload/' + branch;
 }
-function ownerUploadGithubUrl(repo) {
-  return 'https://github.com/' + encodeURIComponent(repo.owner.login) + '/' + encodeURIComponent(repo.name) +
-    '/upload/' + repo.default_branch.split('/').map(encodeURIComponent).join('/');
-}
-function ownerRenderConnected() {
-  const connected = !!ownerGitHubToken && !!ownerGitHubLogin;
-  document.getElementById('ownerAuthSection').hidden = connected;
-  document.getElementById('ownerFileSection').hidden = !connected;
-  document.getElementById('ownerVerifiedLogin').textContent = ownerGitHubLogin || '';
-}
-function openOwnerUploader(repo) {
-  ownerUploadRepo = repo;
-  document.getElementById('ownerUploadRepoName').textContent = repo.owner.login + '/' + repo.name;
-  document.getElementById('ownerOpenGitHub').href = ownerUploadGithubUrl(repo);
-  ownerImageFiles.value = '';
-  ownerClearImagePreviews();
-  ownerStatus('');
-  ownerRenderConnected();
-  if (!ownerUploadDialog.open) ownerUploadDialog.showModal();
-}
-function ownerClearImagePreviews() {
-  ownerPreviewObjectUrls.forEach(url => URL.revokeObjectURL(url));
-  ownerPreviewObjectUrls = [];
-  ownerImagePreview.replaceChildren();
-}
-function ownerDisconnect() {
-  ownerGitHubToken = null;
-  ownerGitHubLogin = null;
-  ownerTokenInput.value = '';
-  ownerRenderConnected();
-  ownerStatus('Disconnected. Your token was not stored.');
-}
-document.getElementById('ownerDisconnect').addEventListener('click',ownerDisconnect);
-document.getElementById('ownerUploadClose').addEventListener('click',function() { if(!ownerUploadBusy) ownerUploadDialog.close(); });
-ownerUploadDialog.addEventListener('close',function() {
-  ownerTokenInput.value = '';  // Never retain a token in a form field.
-  ownerClearImagePreviews();
-});
-async function ownerApi(path,options) {
-  if (!ownerGitHubToken) throw new Error('Please verify your GitHub account first.');
-  const response = await fetch('https://api.github.com'+path, {
-    method:options && options.method || 'GET',
-    headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+ownerGitHubToken,
-      'X-GitHub-Api-Version':'2022-11-28',...(options && options.body ? {'Content-Type':'application/json'} : {})},
-    ...(options && options.body ? {body:JSON.stringify(options.body)} : {})
-  });
-  const result = await response.json().catch(()=>({}));
-  if (!response.ok) {
-    const details = typeof result.message==='string' ? result.message : 'Request failed';
-    const err = new Error(details + ' (HTTP ' + response.status + ')');
-    err.status = response.status;
-    throw err;
-  }
-  return result;
-}
-async function ownerVerifyIdentity() {
-  const candidate = ownerTokenInput.value.trim();
-  if (!candidate) { ownerStatus('Paste a fine-grained GitHub token first.','error'); return; }
-  ownerVerifyBtn.disabled = true;
-  ownerStatus('Verifying account with GitHub...');
-  ownerGitHubToken = candidate;
-  ownerTokenInput.value = '';
-  try {
-    const profile = await ownerApi('/user');
-    if (!profile.login || profile.login.toLowerCase() !== GITHUB_OWNER.toLowerCase()) {
-      throw new Error('The token belongs to '+(profile.login || 'a different user')+'. Only '+GITHUB_OWNER+' can upload project images.');
-    }
-    ownerGitHubLogin = profile.login;
-    ownerRenderConnected();
-    ownerStatus('Account verified. Select your images and upload.','success');
-  } catch (err) {
-    ownerGitHubToken = null;
-    ownerGitHubLogin = null;
-    ownerRenderConnected();
-    ownerStatus('Verification failed: '+err.message,'error');
-  } finally { ownerVerifyBtn.disabled = false; }
-}
-ownerVerifyBtn.addEventListener('click',ownerVerifyIdentity);
-ownerTokenInput.addEventListener('keydown',function(event){if(event.key==='Enter'){event.preventDefault();ownerVerifyIdentity();}});
-ownerImageFiles.addEventListener('change',function() {
-  ownerClearImagePreviews();
-  const selected=Array.from(ownerImageFiles.files || []).slice(0,8);
-  selected.forEach(function(file) {
-    if (!/^image\/(png|jpeg|webp|gif)$/.test(file.type)) return;
-    const image = document.createElement('img');
-    image.alt = file.name;
-    const localUrl = URL.createObjectURL(file);
-    ownerPreviewObjectUrls.push(localUrl);
-    image.src = localUrl;
-    ownerImagePreview.appendChild(image);
-  });
-  ownerStatus(selected.length ? selected.length+' image(s) selected. Ready to upload.' : '');
-});
-function uploadImagePath(file,index,cover) {
-  const allowed={ 'image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/gif':'gif' };
-  const ext=allowed[file.type];
-  if (!ext) throw new Error('Unsupported file type: '+file.name);
-  if (cover && index===0) return 'screenshots/cover.'+ext;
-  const base=file.name.replace(/\.[^.]+$/,'').replace(/[^a-z0-9_-]+/gi,'-').replace(/^-+|-+$/g,'').slice(0,55) || 'image';
-  return 'screenshots/'+Date.now()+'-'+index+'-'+base+'.'+ext;
-}
-function toBase64(file) {
-  return new Promise((resolve,reject)=>{
-    const reader=new FileReader();
-    reader.onload=()=>resolve(String(reader.result).split(',')[1]);
-    reader.onerror=()=>reject(new Error('Could not read image '+file.name));
-    reader.readAsDataURL(file);
-  });
-}
-async function submitOwnerImages() {
-  if (ownerUploadBusy) return;
-  if (!ownerUploadRepo || !ownerGitHubToken || ownerGitHubLogin?.toLowerCase() !== GITHUB_OWNER.toLowerCase()) {
-    ownerStatus('Verify your GitHub account first.','error'); return;
-  }
-  const files = Array.from(ownerImageFiles.files || []);
-  if (!files.length || files.length>8) {ownerStatus('Select 1–8 images.','error');return;}
-  if (files.some(f=>!/^image\/(png|jpeg|webp|gif)$/.test(f.type) || f.size > 5*1024*1024 || !f.size)) {
-    ownerStatus('Each image must be PNG, JPEG, WebP or GIF and 5 MB or smaller.','error'); return;
-  }
-  const repo=ownerUploadRepo;
-  ownerUploadBusy=true;
-  ownerSubmitBtn.disabled=true;
-  ownerStatus('Checking write access to '+repo.name+'...');
-  let count=0;
-  try {
-    const repoPath='/repos/'+encodeURIComponent(repo.owner.login)+'/'+encodeURIComponent(repo.name);
-    const details=await ownerApi(repoPath);
-    if (details.permissions && details.permissions.push===false) throw new Error('This token cannot write to '+repo.name+'. Grant Contents: Read and write for this repository.');
-    const wantCover=document.getElementById('ownerUseCover').checked;
-    const uploads=[];
-    for (let index=0;index<files.length;index++) {
-      const file=files[index];
-      const path=uploadImagePath(file,index,wantCover);
-      const url=repoPath+'/contents/'+path.split('/').map(encodeURIComponent).join('/');
-      let existingSha=null;
-      if (wantCover && index===0) {
-        try {
-          const prior=await ownerApi(url+'?ref='+encodeURIComponent(repo.default_branch));
-          existingSha=prior.sha || null;
-        } catch(err) {
-          if (err.status !== 404) throw err;
-        }
-        if (existingSha && !window.confirm('This repository already has a '+path+' image. Replace it with your new image?')) {
-          throw new Error('Upload cancelled. Uncheck “Make the first uploaded image the project cover” to add without replacing.');
-        }
-      }
-      ownerStatus('Uploading '+(index+1)+' of '+files.length+': '+file.name+'...');
-      const content=await toBase64(file);
-      const body={message:'Add portfolio screenshot: '+file.name,content,branch:repo.default_branch};
-      if(existingSha) body.sha=existingSha;
-      await ownerApi(url,{method:'PUT',body});
-      uploads.push(path);
-      count++;
-    }
-    imagePromises.forEach((_,key)=>{if(key.startsWith(String(repo.id)+':'))imagePromises.delete(key);});
-    try {localStorage.removeItem('portfolio:images:v2:'+repo.id);}catch(err){}
-    repo.pushed_at=new Date().toISOString();
-    const card=cards.find(c=>repoForCard.get(c)===repo);
-    if(card){
-      const media=card.querySelector('.project-media');
-      media.querySelectorAll('.project-cover-image,.project-image-count').forEach(el=>el.remove());
-      media.classList.remove('has-image');
-      delete media.dataset.imageReady;
-      hydrateProjectCover(card,repo);
-    }
-    ownerImageFiles.value='';
-    ownerClearImagePreviews();
-    ownerStatus('Success! Uploaded '+count+' image(s) to '+repo.name+'. The project gallery will show them shortly.','success');
-  } catch(err) {
-    ownerStatus('Uploaded '+count+' of '+files.length+' image(s). '+err.message,'error');
-  } finally {ownerUploadBusy=false;ownerSubmitBtn.disabled=false;}
-}
-ownerSubmitBtn.addEventListener('click',submitOwnerImages);
 if (new URLSearchParams(window.location.search).get('manage') === '1') {
-  const hint=document.createElement('p');
-  hint.className='project-manage-hint';
-  hint.innerHTML='<i class="fas fa-images"></i> Image manager: click Add Image on any project card to upload photos after GitHub verification.';
+  const hint = document.createElement('p');
+  hint.className = 'project-manage-hint';
+  hint.innerHTML = '<i class="fas fa-images"></i> Image manager: click Add Image to open GitHub, sign in normally, upload your picture, and commit it. Return here and refresh to see it.';
   projectSubtitle.after(hint);
 }
 
