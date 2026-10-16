@@ -607,6 +607,11 @@ footer{
 .project-gallery-thumb img{height:100%;width:100%;object-fit:cover}
 @media(max-width:600px){.project-gallery-dialog{padding:.75rem}.project-gallery-main{max-width:calc(100% - 76px)}.project-gallery-view .slider-btn{width:34px;height:34px;flex-shrink:0}}
 
+
+/* Image upload shortcut shown when the portfolio URL contains ?manage=1 */
+.project-upload-link{margin-top:.75rem;align-self:flex-start;border:1px dashed var(--indigo);border-radius:8px;padding:.55rem .75rem;font-weight:600}
+.project-upload-link:hover{background:var(--surface2)}
+
 </style>
 </head>
 <body>
@@ -1438,6 +1443,19 @@ function buildProjectCard(repo, index, total) {
     demo.textContent = 'Live Demo ↗';
     card.appendChild(demo);
   }
+  // Owner-only workflow: add ?manage=1 to show upload links.
+  // Actual permission checking is handled by GitHub, never by client-side JavaScript.
+  if (new URLSearchParams(window.location.search).get('manage') === '1') {
+    const upload = document.createElement('a');
+    upload.className = 'project-link project-upload-link';
+    upload.href = 'https://github.com/' + encodeURIComponent(repo.owner.login) + '/' + encodeURIComponent(repo.name) +
+      '/upload/' + repo.default_branch.split('/').map(encodeURIComponent).join('/');
+    upload.target = '_blank';
+    upload.rel = 'noopener noreferrer';
+    upload.innerHTML = '<i class="fas fa-upload"></i> Upload project image <i class="fas fa-external-link-alt"></i>';
+    upload.title = 'Sign in to GitHub, select screenshots and commit the files; the portfolio discovers them automatically.';
+    card.appendChild(upload);
+  }
   const media = document.createElement('button');
   media.type = 'button';
   media.className = 'project-media';
@@ -1469,29 +1487,120 @@ function imageUrl(repo, path) {
   const file = path.split('/').map(encodeURIComponent).join('/');
   return 'https://raw.githubusercontent.com/' + encodeURIComponent(repo.owner.login) + '/' + encodeURIComponent(repo.name) + '/' + branch + '/' + file;
 }
+
+function isScreenshotFile(path) {
+  return /\.(?:png|jpe?g|gif|webp|avif|svg)(?:[?#].*)?$/i.test(path);
+}
+function isUnhelpfulBadge(url) {
+  return /(?:img\.shields\.io|badgen\.net|badge\.fury\.io|github\.com\/[^/]+\/[^/]+\/actions\/workflows\/[^/]+\/badge\.svg)/i.test(url);
+}
+function resolveReadmeImage(repo, value, embedded) {
+  if (!value) return null;
+  let source = String(value).trim().replace(/^<|>$/g, '').replace(/&amp;/g, '&');
+  if (!source || /^javascript:|^data:/i.test(source)) return null;
+  // Images may be relative to README.md, absolute links, or GitHub issue attachments.
+  const root = 'https://raw.githubusercontent.com/' + encodeURIComponent(repo.owner.login) + '/' +
+    encodeURIComponent(repo.name) + '/' + repo.default_branch.split('/').map(encodeURIComponent).join('/') + '/';
+  try {
+    if (source.startsWith('/')) source = root + source.replace(/^\/+/, '');
+    else source = new URL(source, root + 'README.md').href;
+    const legacyBlobPrefix = 'https://github.com/' + repo.owner.login + '/' + repo.name + '/blob/' + repo.default_branch + '/';
+    if (source.startsWith(legacyBlobPrefix)) source = root + source.slice(legacyBlobPrefix.length).replace(/[?&]raw=(?:1|true)/i, '');
+    const target = new URL(source);
+    if (!['https:','http:'].includes(target.protocol)) return null;
+    if (isUnhelpfulBadge(target.href)) return null;
+    if (!isScreenshotFile(target.pathname) && !(embedded && /(?:github\.com\/user-attachments\/assets\/|user-images\.githubusercontent\.com\/)/i.test(target.href))) return null;
+    return {url:target.href,path:decodeURIComponent(target.pathname.split('/').pop() || 'README image'),source:'README'};
+  } catch (err) { return null; }
+}
+function parseReadmeImages(repo, markdown) {
+  const images = [];
+  const push = (url, embedded) => {
+    const image = resolveReadmeImage(repo, url, embedded);
+    if (image) images.push(image);
+  };
+  // Markdown embedded images, including GitHub user-attachment URLs without extensions.
+  const inline = /!\[[^\]]*\]\(\s*(?:<([^>]+)>|(.+?))(?:\s+["'][^"']*["'])?\s*\)/g;
+  for (const match of markdown.matchAll(inline)) {
+    let src = (match[1] || match[2] || '').trim();
+    // Remove optional Markdown title when it is not captured separately.
+    src = src.replace(/\s+(?:"[^"]*"|'[^']*')\s*$/, '');
+    push(src, true);
+  }
+  // Markdown screenshot hyperlinks (not embedded) also count as images.
+  const linked = /(?<!!)\[[^\]]+\]\(\s*(?:<([^>]+)>|(.+?))(?:\s+["'][^"']*["'])?\s*\)/g;
+  for (const match of markdown.matchAll(linked)) {
+    let src = (match[1] || match[2] || '').trim().replace(/\s+(?:"[^"]*"|'[^']*')\s*$/, '');
+    push(src, false);
+  }
+  // <img src="..."> in README HTML.
+  const htmlImages = /<img\b[^>]*\bsrc\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s>]+))[^>]*>/gi;
+  for (const match of markdown.matchAll(htmlImages)) push(match[1] || match[2] || match[3], true);
+  // Reference-style Markdown images: ![preview][image-id] with [image-id]: image.png
+  const refs = new Map();
+  const refDefs = /^\s*\[([^\]]+)\]:\s*(?:<([^>]+)>|(\S+))/gm;
+  for (const match of markdown.matchAll(refDefs)) refs.set(match[1].toLowerCase(), match[2] || match[3]);
+  const refImages = /!\[([^\]]*)\]\[([^\]]*)\]/g;
+  for (const match of markdown.matchAll(refImages)) {
+    push(refs.get((match[2] || match[1]).toLowerCase()), true);
+  }
+  return images;
+}
 async function getRepositoryImages(repo) {
-  const key = String(repo.id) + ':' + repo.default_branch + ':' + repo.pushed_at;
+  const key = String(repo.id) + ':' + repo.default_branch + ':' + repo.pushed_at + ':v2';
   if (imagePromises.has(key)) return imagePromises.get(key);
   const promise = (async function() {
-    const cacheKey = 'portfolio:images:' + repo.id;
+    const cacheKey = 'portfolio:images:v2:' + repo.id;
     try {
       const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
-      if (cached && cached.version === key && Date.now() - cached.time < 86400000 && Array.isArray(cached.paths)) return cached.paths;
+      if (cached && cached.version === key && Date.now() - cached.time < 86400000 &&
+          Array.isArray(cached.images)) return cached.images;
     } catch (err) { /* storage may be blocked */ }
-    const endpoint = 'https://api.github.com/repos/' + encodeURIComponent(repo.owner.login) + '/' + encodeURIComponent(repo.name) + '/git/trees/' + encodeURIComponent(repo.default_branch) + '?recursive=1';
-    const response = await fetch(endpoint, {headers:{Accept:'application/vnd.github+json'}});
-    if (!response.ok) throw new Error('GitHub images could not load (HTTP ' + response.status + ')');
-    const tree = await response.json();
-    if (!Array.isArray(tree.tree)) throw new Error('GitHub file listing was unavailable.');
-    if (tree.truncated) console.warn('GitHub image listing was truncated for ' + repo.name);
-    const paths = tree.tree.filter(function(entry) {
-      return entry.type === 'blob' && /\.(png|jpe?g|webp|gif|avif|svg)$/i.test(entry.path) &&
-        !/(^|\/)(node_modules|\.git|\.venv|venv|vendor|build|dist)(\/|$)/i.test(entry.path);
-    }).map(function(entry) { return entry.path; }).sort(function(a, b) {
-      return imageRank(a) - imageRank(b) || a.localeCompare(b);
+    const api = 'https://api.github.com/repos/' + encodeURIComponent(repo.owner.login) + '/' + encodeURIComponent(repo.name);
+    let tree = null;
+    let treeError = null;
+    try {
+      const response = await fetch(api + '/git/trees/' + encodeURIComponent(repo.default_branch) + '?recursive=1',
+        {headers:{Accept:'application/vnd.github+json'}});
+      if (!response.ok) throw new Error('GitHub API HTTP ' + response.status);
+      tree = await response.json();
+      if (!Array.isArray(tree.tree)) throw new Error('Invalid repository file list.');
+      if (tree.truncated) console.warn('GitHub image listing may be truncated for ' + repo.name);
+    } catch (err) {
+      treeError = err;
+      console.warn('Unable to scan folders for ' + repo.name, err);
+    }
+    const filePaths = tree && Array.isArray(tree.tree) ? tree.tree.filter(entry =>
+      entry.type === 'blob' && isScreenshotFile(entry.path) &&
+      !/(^|\/)(node_modules|\.git|\.venv|venv|vendor|build|dist)(\/|$)/i.test(entry.path)
+    ).map(entry => entry.path).sort((a,b)=>imageRank(a)-imageRank(b)||a.localeCompare(b)) : [];
+    const readmeEntry = tree && tree.tree && tree.tree.find(entry => entry.type === 'blob' &&
+      /^readme\.(md|markdown|mdown)$/i.test(entry.path));
+    let readmeImages = [];
+    try {
+      const readmeFile = readmeEntry ? readmeEntry.path : 'README.md';
+      const readmeUrl = 'https://raw.githubusercontent.com/' + encodeURIComponent(repo.owner.login) + '/' +
+        encodeURIComponent(repo.name) + '/' + repo.default_branch.split('/').map(encodeURIComponent).join('/') +
+        '/' + readmeFile.split('/').map(encodeURIComponent).join('/');
+      const response = await fetch(readmeUrl);
+      if (response.ok) {
+        const markdown = await response.text();
+        readmeImages = parseReadmeImages(repo, markdown);
+      }
+    } catch (err) { console.warn('Unable to inspect README images for ' + repo.name, err); }
+    if (treeError && !readmeImages.length) throw treeError;
+    // Prioritize explicit cover/thumbnail/poster, then README figures, then every image in any folder.
+    const imageFiles = filePaths.map(path=>({url:imageUrl(repo,path),path:path,source:'folder'}));
+    const highlighted = imageFiles.filter(image=>imageRank(image.path)===0);
+    const images = [];
+    const seen = new Set();
+    highlighted.concat(readmeImages,imageFiles).forEach(image=>{
+      const key = image.url.replace(/[?#].*$/, '');
+      if (!seen.has(key)) { images.push(image); seen.add(key); }
     });
-    try { localStorage.setItem(cacheKey, JSON.stringify({version:key,time:Date.now(),paths:paths})); } catch (err) { /* quota or privacy restrictions */ }
-    return paths;
+    try { localStorage.setItem(cacheKey, JSON.stringify({version:key,time:Date.now(),images:images})); }
+    catch (err) { /* quota or browser privacy restriction */ }
+    return images;
   })();
   imagePromises.set(key, promise);
   promise.catch(function() { imagePromises.delete(key); });
@@ -1501,24 +1610,30 @@ async function hydrateProjectCover(card, repo) {
   const media = card.querySelector('.project-media');
   if (!media || media.dataset.imageReady) return;
   media.dataset.imageReady = 'true';
-  let paths;
-  try { paths = await getRepositoryImages(repo); }
+  let images;
+  try { images = await getRepositoryImages(repo); }
   catch (err) { console.warn('Could not fetch screenshots for ' + repo.name, err); return; }
-  if (!paths.length || !card.isConnected) return;
+  if (!images.length || !card.isConnected) return;
   const photo = document.createElement('img');
   photo.className = 'project-cover-image';
   photo.loading = 'lazy';
   photo.decoding = 'async';
   photo.alt = 'Screenshot of ' + readableRepoName(repo.name);
-  photo.src = imageUrl(repo, paths[0]);
-  photo.addEventListener('error', function() { photo.remove(); media.classList.remove('has-image'); });
+  let candidate = 0;
+  photo.addEventListener('error', function() {
+    candidate++;
+    if (candidate < images.length) photo.src = images[candidate].url;
+    else { photo.remove(); media.classList.remove('has-image'); }
+  });
+  photo.src = images[0].url;
   media.prepend(photo);
   media.classList.add('has-image');
   const count = document.createElement('span');
   count.className = 'project-image-count';
-  count.textContent = paths.length + (paths.length === 1 ? ' image' : ' images') + ' · View gallery';
+  count.textContent = images.length + (images.length === 1 ? ' image' : ' images') + ' · View gallery';
   media.appendChild(count);
 }
+
 function observeProjectImages() {
   if (imageObserver) imageObserver.disconnect();
   if ('IntersectionObserver' in window) {
@@ -1558,9 +1673,10 @@ let galleryRequest = 0;
 function showGalleryImage(index) {
   if (!galleryPaths.length) return;
   galleryIndex = (index + galleryPaths.length) % galleryPaths.length;
-  galleryMain.src = imageUrl(galleryRepo, galleryPaths[galleryIndex]);
-  galleryMain.alt = 'Project image ' + (galleryIndex + 1) + ': ' + galleryPaths[galleryIndex];
-  galleryCount.textContent = (galleryIndex + 1) + ' of ' + galleryPaths.length + ' images · ' + galleryPaths[galleryIndex];
+  const image = galleryPaths[galleryIndex];
+  galleryMain.src = image.url;
+  galleryMain.alt = 'Project image ' + (galleryIndex + 1) + ': ' + image.path;
+  galleryCount.textContent = (galleryIndex + 1) + ' of ' + galleryPaths.length + ' images · ' + image.path;
   Array.from(galleryThumbs.children).forEach(function(btn, i) {
     btn.classList.toggle('active', i === galleryIndex);
     btn.setAttribute('aria-pressed', i === galleryIndex ? 'true' : 'false');
@@ -1571,31 +1687,31 @@ async function openProjectGallery(repo, displayName) {
   const requestId = ++galleryRequest;
   galleryRepo = repo;
   galleryTitle.textContent = displayName + ' — Screenshots';
-  galleryMessage.textContent = 'Loading images from GitHub...';
+  galleryMessage.textContent = 'Searching README images and repository folders...';
   galleryView.hidden = true;
   galleryThumbs.replaceChildren();
   galleryCount.textContent = '';
   galleryPaths = [];
   if (!gallery.open) gallery.showModal();
   try {
-    const paths = await getRepositoryImages(repo);
+    const images = await getRepositoryImages(repo);
     if (requestId !== galleryRequest || !gallery.open) return;
-    galleryPaths = paths;
-    if (!paths.length) {
-      galleryMessage.textContent = 'No image files found in this repository yet. Add screenshots to your GitHub repo to show them here.';
+    galleryPaths = images;
+    if (!images.length) {
+      galleryMessage.textContent = 'No screenshots found in this README or repository folders yet. Upload an image to this repository to show it here.';
       return;
     }
     galleryMessage.textContent = '';
     galleryView.hidden = false;
-    paths.forEach(function(path, i) {
+    images.forEach(function(image, i) {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'project-gallery-thumb';
-      button.setAttribute('aria-label', 'View image ' + (i + 1) + ': ' + path);
+      button.setAttribute('aria-label', 'View image ' + (i + 1) + ': ' + image.path);
       const thumb = document.createElement('img');
       thumb.loading = 'lazy';
-      thumb.alt = path;
-      thumb.src = imageUrl(repo, path);
+      thumb.alt = image.path;
+      thumb.src = image.url;
       button.appendChild(thumb);
       button.addEventListener('click', function() { showGalleryImage(i); });
       galleryThumbs.appendChild(button);
@@ -1605,6 +1721,7 @@ async function openProjectGallery(repo, displayName) {
     if (requestId === galleryRequest) galleryMessage.textContent = 'Could not load GitHub images right now. Please try again later.';
   }
 }
+
 document.getElementById('galleryClose').addEventListener('click', function() { gallery.close(); });
 document.getElementById('galleryPrev').addEventListener('click', function() { showGalleryImage(galleryIndex - 1); });
 document.getElementById('galleryNext').addEventListener('click', function() { showGalleryImage(galleryIndex + 1); });
