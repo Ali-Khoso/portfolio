@@ -9,7 +9,7 @@ is included initially. Additional public posts can be inserted in the `posts` ar
 Card links open the original LinkedIn post. You can edit the feed file on GitHub,
 then refresh the live portfolio to display the committed posts.
 
-## Enable automatic daily updates
+## Enable automatic monthly updates
 
 LinkedIn requires the restricted **r_member_social** read permission to retrieve
 personal member posts. A normal LinkedIn login and w_member_social do not grant this permission.
@@ -24,7 +24,7 @@ Your LinkedIn developer application must first be approved for this access.
 6. Optional: add `LINKEDIN_API_VERSION` as an Actions variable using a currently
    supported YYYYMM LinkedIn Marketing API version (workflow defaults to `202608`).
 7. Run **Actions > Sync LinkedIn posts > Run workflow**.
-8. The workflow will repeat daily and commit new public member posts into
+8. The workflow will repeat on the 1st day of every month at 06:23 UTC and commit new public member posts into
    `data/linkedin-posts.json`. GitHub Pages then serves the updated feed.
 
 To inspect the workflow: `.github/workflows/linkedin-sync.yml`.
