@@ -87,55 +87,162 @@ html.light .mesh-orb{opacity:.09}
 ::-webkit-scrollbar-thumb{background:var(--indigo);border-radius:99px}
 
 /* ============================================================
-   NAVBAR
+   APPLE-INSPIRED FLOATING GLASS NAVBAR
    ============================================================ */
 #navbar{
-  position:fixed;top:0;left:0;right:0;z-index:1000;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 5%;height:68px;
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  background:rgba(15,23,42,.75);
-  border-bottom:1px solid var(--border2);
-  transition:background var(--transition);
+  position:fixed;
+  top:12px;
+  left:50%;
+  right:auto;
+  transform:translateX(-50%);
+  width:min(calc(100% - 36px),1320px);
+  height:64px;
+  z-index:1000;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:0 clamp(14px,1.6vw,22px);
+  border-radius:24px;
+  isolation:isolate;
+  background:linear-gradient(135deg,rgba(30,41,65,.68),rgba(16,25,47,.47));
+  -webkit-backdrop-filter:blur(25px) saturate(180%);
+  backdrop-filter:blur(25px) saturate(180%);
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 13px 38px rgba(3,8,26,.27),0 3px 10px rgba(3,8,26,.10),
+    inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(255,255,255,.035);
+  transition:background .35s ease,box-shadow .35s ease,border-color .35s ease,top .35s ease;
 }
-html.light #navbar{background:rgba(248,250,252,.85)}
+#navbar::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  background:linear-gradient(115deg,rgba(255,255,255,.12),rgba(255,255,255,.025) 25%,transparent 60%);
+  opacity:.55;
+  z-index:-1;
+}
+#navbar.scrolled{
+  background:linear-gradient(135deg,rgba(29,39,63,.89),rgba(15,23,45,.76));
+  border-color:rgba(255,255,255,.19);
+  box-shadow:0 18px 46px rgba(2,6,23,.34),0 4px 14px rgba(2,6,23,.12),
+    inset 0 1px 0 rgba(255,255,255,.25),inset 0 -1px 0 rgba(255,255,255,.04);
+}
+html.light #navbar{
+  background:linear-gradient(135deg,rgba(255,255,255,.78),rgba(236,242,252,.62));
+  border-color:rgba(255,255,255,.88);
+  box-shadow:0 12px 34px rgba(32,50,92,.11),0 3px 10px rgba(32,50,92,.05),
+    inset 0 1px 0 rgba(255,255,255,.92);
+}
+html.light #navbar.scrolled{
+  background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(239,243,251,.82));
+  box-shadow:0 16px 44px rgba(32,50,92,.16),inset 0 1px 0 rgba(255,255,255,.95);
+}
 .nav-logo{
   font-family:'Space Grotesk',sans-serif;
-  font-weight:700;font-size:1.25rem;
-  background:var(--accent-grd);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;
-  letter-spacing:-.02em;
+  font-weight:700;font-size:1.36rem;letter-spacing:-.045em;
+  background:var(--accent-grd);-webkit-background-clip:text;
+  background-clip:text;-webkit-text-fill-color:transparent;
+  padding:0 4px;white-space:nowrap;flex-shrink:0;
+  filter:drop-shadow(0 2px 8px rgba(139,92,246,.18));
 }
-.nav-links{display:flex;gap:2rem;align-items:center}
+.nav-links{
+  display:flex;
+  flex-wrap:nowrap;
+  align-items:center;
+  gap:3px;
+  min-width:0;
+  padding:5px;
+  border-radius:999px;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.07);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.075),0 3px 13px rgba(0,0,0,.10);
+}
+html.light .nav-links{
+  background:rgba(255,255,255,.35);
+  border-color:rgba(100,116,139,.10);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 2px 12px rgba(30,41,59,.04);
+}
 .nav-links a{
-  font-size:.875rem;font-weight:500;color:var(--text-muted);
-  transition:color var(--transition);position:relative;
+  position:relative;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:clamp(.74rem,.82vw,.84rem);
+  font-weight:600;letter-spacing:-.015em;
+  line-height:1.2;
+  color:var(--text-muted);
+  white-space:nowrap;
+  padding:9px clamp(8px,.83vw,13px);
+  border-radius:999px;
+  border:1px solid transparent;
+  text-decoration:none;
+  transition:color .26s ease,background .26s ease,box-shadow .26s ease,transform .26s ease,border-color .26s ease;
 }
-.nav-links a::after{
-  content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;
-  background:var(--accent-grd);border-radius:1px;
-  transition:width var(--transition);
+.nav-links a::after{display:none!important}
+.nav-links a:hover{
+  color:var(--text);
+  background:rgba(255,255,255,.075);
+  transform:translateY(-1px);
 }
-.nav-links a:hover,.nav-links a.active{color:var(--text)}
-.nav-links a:hover::after,.nav-links a.active::after{width:100%}
-.nav-right{display:flex;align-items:center;gap:1.5rem}
-/* Theme toggle */
+.nav-links a.active,.nav-links a[aria-current="page"]{
+  color:#fff;
+  background:linear-gradient(180deg,rgba(255,255,255,.19),rgba(255,255,255,.065));
+  border-color:rgba(255,255,255,.16);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 4px 14px rgba(2,6,23,.20);
+}
+html.light .nav-links a.active,html.light .nav-links a[aria-current="page"]{
+  color:#3730a3;
+  background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(224,231,255,.65));
+  border-color:rgba(99,102,241,.16);
+  box-shadow:inset 0 1px 0 #fff,0 4px 13px rgba(99,102,241,.13);
+}
+.nav-links a:focus-visible,.theme-toggle:focus-visible,.hamburger:focus-visible,
+.drawer-close:focus-visible,.nav-drawer a:focus-visible{
+  outline:2px solid var(--cyan);outline-offset:3px;
+}
+.nav-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+/* Compact glass-style theme switch */
 .theme-toggle{
-  width:52px;height:28px;border-radius:99px;
-  background:var(--surface2);border:1px solid var(--border);
-  position:relative;cursor:pointer;transition:background var(--transition);
-  flex-shrink:0;
+  width:59px;height:34px;flex-shrink:0;
+  position:relative;border-radius:999px;cursor:pointer;
+  background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.17);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 3px 10px rgba(0,0,0,.12);
+  transition:background .28s ease,transform .28s ease,border-color .28s ease;
 }
+.theme-toggle:hover{background:rgba(255,255,255,.14);transform:translateY(-1px)}
 .theme-toggle::after{
-  content:'';position:absolute;top:3px;left:3px;
-  width:20px;height:20px;border-radius:50%;
+  content:"";position:absolute;top:4px;left:4px;
+  width:24px;height:24px;border-radius:50%;
   background:var(--accent-grd);
-  transition:transform var(--transition),background var(--transition);
+  box-shadow:0 3px 10px rgba(99,102,241,.3),inset 0 1px 2px rgba(255,255,255,.44);
+  transition:transform .28s cubic-bezier(.2,.8,.2,1);
 }
-html.light .theme-toggle::after{transform:translateX(24px)}
-.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
-.hamburger span{width:22px;height:2px;background:var(--text-muted);border-radius:1px;transition:var(--transition)}
+html.light .theme-toggle{
+  background:rgba(226,232,240,.70);border-color:rgba(99,102,241,.14);
+}
+html.light .theme-toggle::after{transform:translateX(25px)}
+.hamburger{
+  display:none;
+  flex-direction:column;align-items:center;justify-content:center;
+  gap:5px;width:40px;height:40px;padding:0;
+  border-radius:13px;
+  border:1px solid rgba(255,255,255,.13);
+  background:rgba(255,255,255,.075);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+  cursor:pointer;flex-shrink:0;
+}
+.hamburger span{
+  width:18px;height:2px;border-radius:999px;
+  background:var(--text);transition:transform .25s ease,opacity .25s ease;
+}
+.hamburger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.hamburger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.hamburger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+@supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+  #navbar{background:rgba(18,27,48,.97)}
+  html.light #navbar{background:rgba(248,250,252,.97)}
+}
 
 /* ============================================================
    SECTION SCAFFOLD
@@ -540,25 +647,43 @@ footer{
 @keyframes waPulse{0%,100%{box-shadow:0 6px 24px rgba(37,211,102,.4),0 0 0 0 rgba(37,211,102,.35)}50%{box-shadow:0 6px 24px rgba(37,211,102,.4),0 0 0 12px rgba(37,211,102,.0)}}
 
 /* ============================================================
-   MOBILE NAV DRAWER
+   MOBILE DRAWER — translucent layered glass
    ============================================================ */
 .nav-drawer{
-  position:fixed;inset:0;z-index:999;
-  background:rgba(15,23,42,.97);
-  backdrop-filter:blur(20px);
+  position:fixed;inset:0;z-index:1200;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:2rem;
-  transform:translateX(100%);transition:transform .4s cubic-bezier(.4,0,.2,1);
+  gap:12px;padding:90px 20px 34px;
+  overflow-y:auto;
+  background:rgba(9,17,36,.79);
+  -webkit-backdrop-filter:blur(28px) saturate(165%);
+  backdrop-filter:blur(28px) saturate(165%);
+  transform:translateX(105%);
+  visibility:hidden;
+  transition:transform .4s cubic-bezier(.22,1,.36,1),visibility .4s;
 }
-.nav-drawer.open{transform:none}
-.nav-drawer a{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:600;color:var(--text)}
+.nav-drawer.open{transform:translateX(0);visibility:visible}
+html.light .nav-drawer{background:rgba(240,245,253,.87)}
+.nav-drawer a{
+  display:block;width:min(100%,345px);padding:12px 22px;
+  font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:600;
+  text-align:center;color:var(--text);
+  border-radius:17px;
+  background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.10);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 22px rgba(0,0,0,.13);
+  transition:background .25s ease,transform .25s ease;
+}
+html.light .nav-drawer a{background:rgba(255,255,255,.65);border-color:rgba(99,102,241,.10)}
+.nav-drawer a:hover{background:rgba(99,102,241,.19);transform:translateY(-2px)}
 .drawer-close{
-  position:absolute;top:1.5rem;right:1.5rem;
-  width:40px;height:40px;border-radius:50%;
-  background:var(--surface);border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:var(--text-muted);font-size:1rem;
+  position:absolute;top:25px;right:24px;
+  width:44px;height:44px;
+  border-radius:14px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--text);font-size:1rem;
+  border:1px solid rgba(255,255,255,.16);
+  background:rgba(255,255,255,.085);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 4px 14px rgba(0,0,0,.13);
 }
+body.drawer-open{overflow:hidden}
 
 /* ============================================================
    RESPONSIVE
@@ -570,8 +695,6 @@ footer{
   .hero-bio{margin:0 auto 2.5rem}
   .hero-bento{display:grid;grid-template-columns:1fr 1fr;max-width:420px;margin:0 auto}
   .contact-grid{grid-template-columns:1fr}
-  .nav-links{display:none}
-  .hamburger{display:flex}
   .exp-timeline::before{display:none}
   .exp-item{padding-left:1.75rem}
   .exp-item::before{display:none}
@@ -582,6 +705,31 @@ footer{
   .hero-stats{gap:1.5rem}
   .section{padding:70px 5%}
 }
+
+
+/* Navigation breakpoint: all eight tabs fit comfortably above this width. */
+@media(max-width:1180px){
+  .nav-links{display:none}
+  .hamburger{display:flex}
+}
+@media(max-width:600px){
+  #navbar{top:10px;width:calc(100% - 24px);height:59px;padding:0 13px;border-radius:20px}
+  .nav-logo{font-size:1.25rem}
+  .nav-right{gap:8px}
+  .theme-toggle{width:54px;height:32px}
+  .theme-toggle::after{width:22px;height:22px;top:4px;left:4px}
+  html.light .theme-toggle::after{transform:translateX(22px)}
+}
+@media(max-height:660px) and (max-width:1180px){
+  .nav-drawer{justify-content:flex-start;gap:8px;padding-top:76px}
+  .nav-drawer a{padding:9px 18px}
+}
+@media(prefers-reduced-motion:reduce){
+  #navbar,.nav-links a,.theme-toggle,.theme-toggle::after,.nav-drawer,
+  .nav-drawer a,.hamburger span{transition:none!important}
+}
+html{scroll-padding-top:100px}
+#hero{padding-top:90px}
 
 /* GitHub-powered project covers and image gallery; inherits portfolio theme */
 .project-media{position:relative;width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;margin:0 0 1.15rem;padding:0;overflow:hidden;border:1px solid var(--border2);border-radius:12px;background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(139,92,246,.1));color:var(--text);cursor:pointer}
@@ -673,16 +821,16 @@ footer{
     <a href="#contact">Contact</a>
   </div>
   <div class="nav-right">
-    <div class="theme-toggle" id="themeToggle" title="Toggle theme" role="button" aria-label="Toggle dark/light mode"></div>
-    <div class="hamburger" id="hamburger" aria-label="Open menu">
+    <div class="theme-toggle" id="themeToggle" title="Toggle theme" role="button" tabindex="0" aria-label="Toggle dark/light mode"></div>
+    <div class="hamburger" id="hamburger" role="button" tabindex="0" aria-label="Open menu" aria-expanded="false" aria-controls="navDrawer">
       <span></span><span></span><span></span>
     </div>
   </div>
 </nav>
 
 <!-- MOBILE DRAWER -->
-<nav class="nav-drawer" id="navDrawer">
-  <div class="drawer-close" id="drawerClose"><i class="fas fa-times"></i></div>
+<nav class="nav-drawer" id="navDrawer" aria-label="Mobile navigation" aria-hidden="true" inert>
+  <div class="drawer-close" id="drawerClose" role="button" tabindex="0" aria-label="Close menu"><i class="fas fa-times"></i></div>
   <a href="#hero" class="drawer-link">Home</a>
   <a href="#skills" class="drawer-link">Skills</a>
   <a href="#experience" class="drawer-link">Experience</a>
@@ -1267,25 +1415,51 @@ const drawer = document.getElementById('navDrawer');
 const drawerClose = document.getElementById('drawerClose');
 const drawerLinks = document.querySelectorAll('.drawer-link');
 
-hamburger.addEventListener('click',()=>drawer.classList.add('open'));
-drawerClose.addEventListener('click',()=>drawer.classList.remove('open'));
-drawerLinks.forEach(l=>l.addEventListener('click',()=>drawer.classList.remove('open')));
+function setDrawerOpen(open){
+  drawer.classList.toggle('open',open);
+  drawer.inert=!open;
+  drawer.setAttribute('aria-hidden',open?'false':'true');
+  hamburger.setAttribute('aria-expanded',open?'true':'false');
+  document.body.classList.toggle('drawer-open',open);
+  if(open)drawerClose.focus();
+  else hamburger.focus({preventScroll:true});
+}
+hamburger.addEventListener('click',()=>setDrawerOpen(true));
+drawerClose.addEventListener('click',()=>setDrawerOpen(false));
+drawerLinks.forEach(l=>l.addEventListener('click',()=>setDrawerOpen(false)));
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&drawer.classList.contains('open'))setDrawerOpen(false);
+});
+function makeKeyClickable(el,callback){
+  el.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();callback()}
+  });
+}
+makeKeyClickable(hamburger,()=>setDrawerOpen(true));
+makeKeyClickable(drawerClose,()=>setDrawerOpen(false));
+makeKeyClickable(toggle,()=>toggle.click());
 
 /* ======================================================
-   ACTIVE NAV LINK ON SCROLL
+   ACTIVE NAV LINK & GLASS OPACITY ON SCROLL
 ====================================================== */
+const navbar = document.getElementById('navbar');
 const sections = document.querySelectorAll('section[id]');
 const navLinks = document.querySelectorAll('.nav-links a');
 const onScroll = ()=>{
-  let current='';
+  navbar.classList.toggle('scrolled',window.scrollY>30);
+  let current='hero';
   sections.forEach(s=>{
-    if(window.scrollY >= s.offsetTop - 100) current = s.id;
+    if(window.scrollY+160>=s.offsetTop)current=s.id;
   });
   navLinks.forEach(a=>{
-    a.classList.toggle('active', a.getAttribute('href')==='#'+current);
+    const active=a.getAttribute('href')==='#'+current;
+    a.classList.toggle('active',active);
+    if(active)a.setAttribute('aria-current','page');
+    else a.removeAttribute('aria-current');
   });
 };
-window.addEventListener('scroll', onScroll, {passive:true});
+window.addEventListener('scroll',onScroll,{passive:true});
+onScroll();
 
 /* ======================================================
    AOS (scroll reveal)
