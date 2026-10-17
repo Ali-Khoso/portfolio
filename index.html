@@ -646,6 +646,32 @@ footer{
 .wa-float:hover{transform:scale(1.12);box-shadow:0 10px 32px rgba(37,211,102,.6);animation:none}
 @keyframes waPulse{0%,100%{box-shadow:0 6px 24px rgba(37,211,102,.4),0 0 0 0 rgba(37,211,102,.35)}50%{box-shadow:0 6px 24px rgba(37,211,102,.4),0 0 0 12px rgba(37,211,102,.0)}}
 
+/* LinkedIn floating button — matches WhatsApp shape and raised halo */
+.linkedin-float{
+  position:fixed;right:2rem;bottom:calc(2rem + 76px);z-index:999;
+  width:56px;height:56px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:1.5rem;
+  background:linear-gradient(135deg,#0A66C2,#0077B5);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 6px 24px rgba(10,102,194,.42),inset 0 1px 1px rgba(255,255,255,.22);
+  cursor:pointer;
+  transition:transform var(--transition),box-shadow var(--transition);
+  animation:linkedinPulse 3s ease-in-out infinite;
+}
+.linkedin-float:hover{
+  transform:scale(1.12);color:#fff;
+  box-shadow:0 10px 32px rgba(10,102,194,.62),0 0 0 8px rgba(10,102,194,.14);
+  animation:none;
+}
+.linkedin-float:focus-visible{outline:3px solid #8cc9ff;outline-offset:4px;animation:none}
+@keyframes linkedinPulse{
+  0%,100%{box-shadow:0 6px 24px rgba(10,102,194,.42),0 0 0 0 rgba(10,102,194,.30)}
+  50%{box-shadow:0 6px 24px rgba(10,102,194,.42),0 0 0 12px rgba(10,102,194,0)}
+}
+@media(prefers-reduced-motion:reduce){.linkedin-float{animation:none}}
+
+
 /* ============================================================
    MOBILE DRAWER — translucent layered glass
    ============================================================ */
@@ -1386,6 +1412,12 @@ html{scroll-padding-top:100px}
 <footer>
   <p class="footer-text">Designed &amp; Built by <span>Ali Ahmed Khoso</span> · 2025 · Islamabad, Pakistan</p>
 </footer>
+
+<!-- LinkedIn FAB: just above WhatsApp -->
+<a href="https://www.linkedin.com/in/ali-ahmed-khoso/" target="_blank" rel="noopener noreferrer"
+   class="linkedin-float" title="Connect on LinkedIn" aria-label="Open Ali Ahmed Khoso's LinkedIn profile">
+  <i class="fab fa-linkedin-in" aria-hidden="true"></i>
+</a>
 
 <!-- WhatsApp FAB -->
 <a href="https://wa.me/923023415810?text=Hi%20Ali,%20I%20viewed%20your%20portfolio%20and%20would%20like%20to%20connect!" target="_blank" class="wa-float" title="Chat on WhatsApp">
