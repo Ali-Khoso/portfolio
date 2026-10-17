@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ali Ahmed Khoso — AI Developer & Full-Stack Engineer</title>
+<title>Ali Ahmed Khoso — AI Automation Engineer | n8n, GoHighLevel &amp; Voice Agents</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -416,6 +416,18 @@ main{position:relative;z-index:1}
   transition:all var(--transition);
 }
 .skill-tag:hover{background:rgba(99,102,241,.12);border-color:rgba(99,102,241,.3);color:var(--indigo)}
+
+/* Emphasize automation offerings without changing the existing card system */
+.skill-category.automation-featured{
+  border-color:rgba(16,185,129,.25);
+  background:linear-gradient(145deg,rgba(16,185,129,.07),transparent 48%),var(--surface);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+.skill-category.automation-featured:hover{
+  border-color:rgba(16,185,129,.45);
+  box-shadow:0 12px 32px rgba(16,185,129,.10);
+}
+
 
 /* ============================================================
    EXPERIENCE
@@ -881,12 +893,12 @@ html{scroll-padding-top:100px}
         Ali Ahmed<br><span class="gradient-text">Khoso</span>
       </h1>
       <p class="hero-title">
-        <span>AI Developer</span> &nbsp;·&nbsp; Web &amp; App Engineer
+        <span>AI Automation Engineer</span> &nbsp;·&nbsp; Voice Agents &amp; CRM Automation
       </p>
       <p class="hero-bio">
-        Building intelligent systems at the intersection of AI and software engineering.
-        From LLM fine-tuning and autonomous agents to full-stack apps and workflow automation —
-        I turn complex ideas into production-ready solutions.
+        I design AI-powered workflows that help businesses automate calls, lead management,
+        appointment booking, and customer follow-ups. I work with n8n, GoHighLevel (GHL),
+        Vapi, Twilio, Make, Zapier, and Airtable — backed by API integrations and full-stack development.
       </p>
       <div class="hero-cta">
         <a href="#projects" class="btn btn-primary"><i class="fas fa-layer-group"></i> View Projects</a>
@@ -919,31 +931,33 @@ html{scroll-padding-top:100px}
         <div class="bento-status"><span class="dot"></span> Open to opportunities</div>
       </div>
       <div class="bento-card">
-        <div class="bento-small-title">Core AI Stack</div>
+        <div class="bento-small-title">Automation Platforms</div>
         <div class="bento-skill-chips">
-          <span class="chip">LangChain</span>
-          <span class="chip">RAG</span>
-          <span class="chip">LLM Fine-Tuning</span>
-          <span class="chip">OpenAI API</span>
-          <span class="chip">HuggingFace</span>
+          <span class="chip emerald">n8n</span>
+          <span class="chip emerald">GoHighLevel</span>
+          <span class="chip emerald">Zapier</span>
+          <span class="chip emerald">Make</span>
+          <span class="chip emerald">Airtable</span>
         </div>
       </div>
       <div class="bento-card">
-        <div class="bento-small-title">Web / App</div>
+        <div class="bento-small-title">AI Voice Agents</div>
         <div class="bento-skill-chips">
-          <span class="chip cyan">React</span>
-          <span class="chip cyan">Node.js</span>
-          <span class="chip cyan">Kotlin</span>
-          <span class="chip cyan">Firebase</span>
+          <span class="chip cyan">Vapi</span>
+          <span class="chip cyan">Twilio</span>
+          <span class="chip cyan">AI Receptionists</span>
+          <span class="chip cyan">Call Automation</span>
         </div>
       </div>
       <div class="bento-card" style="grid-column:span 2">
-        <div class="bento-small-title">Automation</div>
+        <div class="bento-small-title">CRM, Integrations &amp; AI</div>
         <div class="bento-skill-chips">
-          <span class="chip emerald">N8N</span>
-          <span class="chip emerald">AutoGPT</span>
-          <span class="chip emerald">AI Voice Agents</span>
-          <span class="chip emerald">CRM Automation</span>
+          <span class="chip emerald">CRM Workflows</span>
+          <span class="chip emerald">Lead Automation</span>
+          <span class="chip emerald">Webhooks</span>
+          <span class="chip emerald">API Integrations</span>
+          <span class="chip emerald">OpenAI API</span>
+          <span class="chip emerald">LangChain &amp; RAG</span>
         </div>
       </div>
     </div>
@@ -953,61 +967,89 @@ html{scroll-padding-top:100px}
 <!-- ============================================================ SKILLS -->
 <section id="skills" class="section">
   <div class="aos">
-    <div class="section-label">Expertise</div>
-    <h2 class="section-title">Technical <span class="gradient-text">Skills</span></h2>
-    <p class="section-sub">A breadth of tools across AI/ML, full-stack development, and intelligent automation.</p>
+    <div class="section-label">Automation Expertise</div>
+    <h2 class="section-title">AI Automation <span class="gradient-text">&amp; Technical Skills</span></h2>
+    <p class="section-sub">Specializing in AI voice agents, CRM workflows, and connected business automations — supported by AI, software engineering, and data skills.</p>
   </div>
   <div class="skills-grid">
-    <div class="skill-category aos">
-      <div class="skill-cat-icon"><i class="fas fa-code"></i></div>
-      <div class="skill-cat-name">Languages</div>
+    <div class="skill-category automation-featured aos">
+      <div class="skill-cat-icon" style="background:linear-gradient(135deg,#10B981,#06B6D4)"><i class="fas fa-diagram-project"></i></div>
+      <div class="skill-cat-name">AI Automation Platforms</div>
       <div class="skill-tags">
-        <span class="skill-tag">Python</span><span class="skill-tag">C++</span>
-        <span class="skill-tag">Java</span><span class="skill-tag">Kotlin</span>
-        <span class="skill-tag">JavaScript</span>
+        <span class="skill-tag">n8n</span>
+        <span class="skill-tag">GoHighLevel (GHL)</span>
+        <span class="skill-tag">Make</span>
+        <span class="skill-tag">Zapier</span>
+        <span class="skill-tag">Airtable</span>
+        <span class="skill-tag">Workflow Automation</span>
       </div>
     </div>
-    <div class="skill-category aos" style="transition-delay:.1s">
-      <div class="skill-cat-icon" style="background:linear-gradient(135deg,#8B5CF6,#06B6D4)"><i class="fas fa-brain"></i></div>
-      <div class="skill-cat-name">AI / ML</div>
+    <div class="skill-category automation-featured aos" style="transition-delay:.06s">
+      <div class="skill-cat-icon" style="background:linear-gradient(135deg,#6366F1,#06B6D4)"><i class="fas fa-headset"></i></div>
+      <div class="skill-cat-name">AI Voice Agents &amp; Telephony</div>
       <div class="skill-tags">
-        <span class="skill-tag">Scikit-learn</span><span class="skill-tag">TensorFlow</span>
-        <span class="skill-tag">Keras</span><span class="skill-tag">OpenCV</span>
-        <span class="skill-tag">Pandas</span><span class="skill-tag">NumPy</span>
+        <span class="skill-tag">Vapi</span>
+        <span class="skill-tag">Twilio</span>
+        <span class="skill-tag">AI Voice Agents</span>
+        <span class="skill-tag">AI Receptionists</span>
+        <span class="skill-tag">Call Flows</span>
+        <span class="skill-tag">Appointment Booking</span>
       </div>
     </div>
-    <div class="skill-category aos" style="transition-delay:.2s">
+    <div class="skill-category automation-featured aos" style="transition-delay:.12s">
+      <div class="skill-cat-icon" style="background:linear-gradient(135deg,#8B5CF6,#EC4899)"><i class="fas fa-people-arrows-left-right"></i></div>
+      <div class="skill-cat-name">CRM &amp; Lead Automation</div>
+      <div class="skill-tags">
+        <span class="skill-tag">GHL CRM</span>
+        <span class="skill-tag">Lead Capture &amp; Routing</span>
+        <span class="skill-tag">Email Automation</span>
+        <span class="skill-tag">Follow-up Sequences</span>
+        <span class="skill-tag">Webhooks</span>
+        <span class="skill-tag">API Integrations</span>
+      </div>
+    </div>
+    <div class="skill-category aos" style="transition-delay:.18s">
       <div class="skill-cat-icon" style="background:linear-gradient(135deg,#06B6D4,#10B981)"><i class="fas fa-robot"></i></div>
       <div class="skill-cat-name">Generative AI &amp; Agents</div>
       <div class="skill-tags">
-        <span class="skill-tag">LangChain</span><span class="skill-tag">OpenAI API</span>
-        <span class="skill-tag">Hugging Face</span><span class="skill-tag">AutoGPT</span>
-        <span class="skill-tag">RAG</span><span class="skill-tag">LLM Fine-Tuning</span>
+        <span class="skill-tag">OpenAI API</span><span class="skill-tag">LangChain</span>
+        <span class="skill-tag">RAG</span><span class="skill-tag">Hugging Face</span>
+        <span class="skill-tag">LLM Fine-Tuning</span><span class="skill-tag">AutoGPT</span>
       </div>
     </div>
-    <div class="skill-category aos" style="transition-delay:.3s">
+    <div class="skill-category aos" style="transition-delay:.24s">
       <div class="skill-cat-icon" style="background:linear-gradient(135deg,#10B981,#6366F1)"><i class="fas fa-globe"></i></div>
-      <div class="skill-cat-name">Web &amp; App</div>
+      <div class="skill-cat-name">Web &amp; App Development</div>
       <div class="skill-tags">
         <span class="skill-tag">React</span><span class="skill-tag">Node.js</span>
         <span class="skill-tag">Express.js</span><span class="skill-tag">HTML5/CSS3</span>
         <span class="skill-tag">Kotlin Android</span><span class="skill-tag">.NET WPF</span>
       </div>
     </div>
-    <div class="skill-category aos" style="transition-delay:.35s">
+    <div class="skill-category aos" style="transition-delay:.3s">
+      <div class="skill-cat-icon"><i class="fas fa-code"></i></div>
+      <div class="skill-cat-name">Programming Languages</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Python</span><span class="skill-tag">JavaScript</span>
+        <span class="skill-tag">C++</span><span class="skill-tag">Java</span>
+        <span class="skill-tag">Kotlin</span>
+      </div>
+    </div>
+    <div class="skill-category aos" style="transition-delay:.36s">
+      <div class="skill-cat-icon" style="background:linear-gradient(135deg,#8B5CF6,#06B6D4)"><i class="fas fa-brain"></i></div>
+      <div class="skill-cat-name">AI / ML &amp; Data</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Scikit-learn</span><span class="skill-tag">TensorFlow</span>
+        <span class="skill-tag">Keras</span><span class="skill-tag">OpenCV</span>
+        <span class="skill-tag">Pandas</span><span class="skill-tag">NumPy</span>
+      </div>
+    </div>
+    <div class="skill-category aos" style="transition-delay:.42s">
       <div class="skill-cat-icon" style="background:linear-gradient(135deg,#F59E0B,#EF4444)"><i class="fas fa-database"></i></div>
       <div class="skill-cat-name">Databases</div>
       <div class="skill-tags">
         <span class="skill-tag">MongoDB</span><span class="skill-tag">Firebase Firestore</span>
         <span class="skill-tag">SQL</span>
-      </div>
-    </div>
-    <div class="skill-category aos" style="transition-delay:.4s">
-      <div class="skill-cat-icon" style="background:linear-gradient(135deg,#EC4899,#8B5CF6)"><i class="fas fa-bolt"></i></div>
-      <div class="skill-cat-name">Automation</div>
-      <div class="skill-tags">
-        <span class="skill-tag">N8N</span><span class="skill-tag">API Integration</span>
-        <span class="skill-tag">Webhooks</span><span class="skill-tag">Workflow Design</span>
       </div>
     </div>
   </div>
