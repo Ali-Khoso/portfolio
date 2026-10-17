@@ -1,0 +1,44 @@
+name: Sync LinkedIn posts
+on:
+  schedule:
+    - cron: '23 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Update LinkedIn feed (approved API access only)
+        env:
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
+          LINKEDIN_API_VERSION: ${{ vars.LINKEDIN_API_VERSION }}
+        run: |
+          if [ -z "$LINKEDIN_ACCESS_TOKEN" ] || [ -z "$LINKEDIN_PERSON_URN" ]; then
+            echo "No approved LinkedIn member-post credentials. Skipping."
+            exit 0
+          fi
+          if [ -z "$LINKEDIN_API_VERSION" ]; then
+            export LINKEDIN_API_VERSION=202608
+          fi
+          python scripts/sync_linkedin.py
+      - name: Commit updated feed
+        run: |
+          if git diff --quiet -- data/linkedin-posts.json; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/linkedin-posts.json
+          git commit -m "Update authorized LinkedIn posts feed"
+          git push
