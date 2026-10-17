@@ -623,6 +623,31 @@ footer{
 .project-manage-hint{display:flex;gap:.6rem;align-items:center;margin-top:.8rem;color:var(--text-muted);font-size:.8rem;line-height:1.6}
 .project-manage-hint i{color:var(--indigo)}
 
+
+/* LinkedIn feed — matches existing portfolio surfaces and accent colors */
+.linkedin-section-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.7rem}
+.linkedin-profile-pill{display:flex;align-items:center;gap:.8rem;color:var(--text);font-size:.88rem}
+.linkedin-profile-pill strong,.linkedin-profile-pill span{display:block}
+.linkedin-profile-pill span{font-size:.74rem;color:var(--text-muted);margin-top:.15rem}
+.linkedin-profile-icon{width:43px;height:43px;flex-shrink:0;display:flex;justify-content:center;align-items:center;background:var(--accent-grd);color:#fff;border-radius:12px;font-size:1.2rem}
+.linkedin-profile-cta{font-size:.79rem;gap:.5rem;padding:.7rem 1rem}
+.linkedin-feed{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.35rem}
+.linkedin-post-card{min-width:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;display:flex;flex-direction:column;gap:.85rem;transition:transform var(--transition),box-shadow var(--transition),border-color var(--transition)}
+.linkedin-post-card:hover{transform:translateY(-5px);box-shadow:var(--glow-vio);border-color:var(--border2)}
+.linkedin-post-top{display:flex;justify-content:space-between;align-items:center;gap:.8rem}
+.linkedin-post-top i{color:var(--indigo);font-size:1.2rem}
+.linkedin-post-meta{font-size:.71rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+.linkedin-post-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.98rem;line-height:1.5;color:var(--text)}
+.linkedin-post-excerpt{font-size:.82rem;color:var(--text-muted);line-height:1.7;flex:1;white-space:pre-line;overflow-wrap:anywhere}
+.linkedin-post-link{display:inline-flex;align-items:center;gap:.45rem;color:var(--indigo);font-weight:600;font-size:.82rem;align-self:flex-start}
+.linkedin-post-link:hover{color:var(--violet);gap:.65rem}
+.linkedin-feed-status{grid-column:1/-1;padding:2rem 1.5rem;border:1px dashed var(--border2);border-radius:var(--radius-lg);color:var(--text-muted);background:var(--surface);font-size:.85rem}
+.linkedin-feed-note{font-size:.77rem;line-height:1.6;color:var(--text-muted);margin-top:1rem}
+.linkedin-manage-posts{display:inline-flex;gap:.5rem;margin-top:.85rem;align-items:center;color:var(--indigo);font-size:.8rem}
+.linkedin-manage-posts[hidden]{display:none}
+@media(max-width:1000px){.linkedin-feed{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.linkedin-feed{grid-template-columns:1fr}.linkedin-section-head{align-items:flex-start}.linkedin-post-card{padding:1.25rem}}
+
 </style>
 </head>
 <body>
@@ -643,6 +668,7 @@ footer{
     <a href="#experience">Experience</a>
     <a href="#research">Research</a>
     <a href="#projects">Projects</a>
+    <a href="#linkedin">LinkedIn</a>
     <a href="#certifications">Certifications</a>
     <a href="#contact">Contact</a>
   </div>
@@ -662,6 +688,7 @@ footer{
   <a href="#experience" class="drawer-link">Experience</a>
   <a href="#research" class="drawer-link">Research</a>
   <a href="#projects" class="drawer-link">Projects</a>
+  <a href="#linkedin" class="drawer-link">LinkedIn</a>
   <a href="#certifications" class="drawer-link">Certifications</a>
   <a href="#contact" class="drawer-link">Contact</a>
 </nav>
@@ -1101,6 +1128,29 @@ footer{
     <div class="slider-dots" id="projDots"></div>
     <button class="slider-btn" id="projNext" aria-label="Next"><i class="fas fa-arrow-right"></i></button>
   </div>
+</section>
+
+<!-- ============================================================ LINKEDIN -->
+<section id="linkedin" class="section">
+  <div class="aos">
+    <div class="section-label">Thoughts &amp; Community</div>
+    <h2 class="section-title">Latest <span class="gradient-text">LinkedIn Posts</span></h2>
+    <p class="section-sub">Projects, AI automation, ideas, and lessons from the tech community — shared on LinkedIn.</p>
+  </div>
+  <div class="linkedin-section-head aos">
+    <div class="linkedin-profile-pill">
+      <div class="linkedin-profile-icon"><i class="fab fa-linkedin-in"></i></div>
+      <div><strong>Ali Ahmed Khoso</strong><span>Software Development · AI · Automation</span></div>
+    </div>
+    <a class="btn btn-outline linkedin-profile-cta" href="https://www.linkedin.com/in/ali-ahmed-khoso/" target="_blank" rel="noopener noreferrer">
+      <i class="fab fa-linkedin-in"></i> View LinkedIn Profile <i class="fas fa-arrow-up-right-from-square"></i>
+    </a>
+  </div>
+  <div class="linkedin-feed" id="linkedinFeed" aria-live="polite">
+    <div class="linkedin-feed-status" role="status"><i class="fas fa-spinner fa-spin"></i> Loading LinkedIn updates...</div>
+  </div>
+  <p class="linkedin-feed-note" id="linkedinFeedNote">Public LinkedIn updates appear here when available.</p>
+  <a class="linkedin-manage-posts" id="linkedinManagePosts" href="https://github.com/Alikhoso81/portfolio/edit/main/data/linkedin-posts.json" target="_blank" rel="noopener noreferrer" hidden><i class="fas fa-pen"></i> Manage LinkedIn post links on GitHub</a>
 </section>
 
 <!-- ============================================================ CERTIFICATIONS -->
@@ -1837,6 +1887,96 @@ function sendMail(){
   const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${msg}`);
   window.location.href=`mailto:aliahmedkhoso17081@gmail.com?subject=${subject}&body=${body}`;
 }
+
+
+/* ======================================================
+   LINKEDIN POSTS — safe public read-only JSON feed.
+   GitHub Actions updates this file only with LinkedIn-approved API access.
+====================================================== */
+const linkedinFeed=document.getElementById('linkedinFeed');
+const linkedinFeedNote=document.getElementById('linkedinFeedNote');
+if(new URLSearchParams(window.location.search).get('manage')==='1'){
+  document.getElementById('linkedinManagePosts').hidden=false;
+}
+function isLinkedInPostUrl(value){
+  try{
+    const link=new URL(value);
+    return link.protocol==='https:' &&
+      (link.hostname==='www.linkedin.com'||link.hostname==='linkedin.com'||link.hostname==='pk.linkedin.com') &&
+      (link.pathname.startsWith('/posts/')||link.pathname.startsWith('/feed/update/'));
+  }catch(error){return false;}
+}
+function linkedInTime(value){
+  if(!value)return '';
+  const dt=new Date(value);
+  if(Number.isNaN(dt.getTime()))return '';
+  return dt.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});
+}
+function renderLinkedInCard(post){
+  const card=document.createElement('article');
+  card.className='linkedin-post-card';
+  const head=document.createElement('div');
+  head.className='linkedin-post-top';
+  const icon=document.createElement('i');
+  icon.className='fab fa-linkedin';
+  icon.setAttribute('aria-hidden','true');
+  const tag=document.createElement('span');
+  tag.className='linkedin-post-meta';
+  tag.textContent=linkedInTime(post.date)||'LinkedIn Update';
+  head.append(icon,tag);
+  const title=document.createElement('h3');
+  title.className='linkedin-post-title';
+  title.textContent=String(post.title||'LinkedIn Update');
+  const excerpt=document.createElement('p');
+  excerpt.className='linkedin-post-excerpt';
+  excerpt.textContent=String(post.excerpt||'Read the full update on LinkedIn.');
+  const link=document.createElement('a');
+  link.className='linkedin-post-link';
+  link.href=post.url;
+  link.target='_blank';
+  link.rel='noopener noreferrer';
+  link.textContent='Read on LinkedIn ↗';
+  card.append(head,title,excerpt,link);
+  return card;
+}
+async function loadLinkedInPosts(){
+  try{
+    const response=await fetch('./data/linkedin-posts.json',{cache:'no-store'});
+    if(!response.ok)throw new Error('Feed unavailable');
+    const data=await response.json();
+    const all=[...(Array.isArray(data.synced_posts)?data.synced_posts:[]),
+      ...(Array.isArray(data.posts)?data.posts:[])].filter(p=>p&&typeof p==='object'&&isLinkedInPostUrl(p.url));
+    const seen=new Set();
+    const unique=all.filter(post=>{
+      const activity=(post.url.match(/(?:activity-|urn:li:(?:share|ugcPost):)(\d+)/)||[])[1]||post.url;
+      if(seen.has(activity))return false;
+      seen.add(activity);return true;
+    });
+    unique.sort((a,b)=>(new Date(b.date||0).getTime()||0)-(new Date(a.date||0).getTime()||0));
+    linkedinFeed.replaceChildren();
+    if(!unique.length){
+      const empty=document.createElement('div');
+      empty.className='linkedin-feed-status';
+      empty.textContent='See my recent projects, posts, and AI automation updates directly on LinkedIn.';
+      linkedinFeed.appendChild(empty);
+      linkedinFeedNote.textContent='Visit my profile above to see the newest public posts.';
+      return;
+    }
+    unique.slice(0,6).forEach(post=>linkedinFeed.appendChild(renderLinkedInCard(post)));
+    linkedinFeedNote.textContent=data.last_synced
+      ? 'Latest public updates synced with LinkedIn on '+linkedInTime(data.last_synced)+'. Open any card to view the original post.'
+      : 'A selected public post is shown. Automatic updates require LinkedIn-approved member-post API access.';
+  }catch(error){
+    linkedinFeed.replaceChildren();
+    const fallback=document.createElement('div');
+    fallback.className='linkedin-feed-status';
+    fallback.textContent='LinkedIn updates are temporarily unavailable. Visit my profile to read my latest posts.';
+    linkedinFeed.appendChild(fallback);
+    linkedinFeedNote.textContent='The LinkedIn profile link above is always available.';
+    console.warn('LinkedIn feed unavailable',error);
+  }
+}
+loadLinkedInPosts();
 
 </script>
 </body>
